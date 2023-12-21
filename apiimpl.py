@@ -24,7 +24,7 @@ def main():
 
     params = util.get_request_param();
 
-    obj = {}
+    obj = {'method': method}
     i = 0
     for key in params:
         obj[key] = params[key]
