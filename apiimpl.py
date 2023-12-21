@@ -26,12 +26,15 @@ def main():
 
     obj = {'method': method}
     i = 0
+    p = {}
     for key in params:
-        obj[key] = params[key]
+        p[key] = params[key]
         i += 1
 
     if i == 0:
         obj = {'message': 'Hello!'}
+    else:
+        obj['params'] = p
 
     j = util.to_json(obj)
 
