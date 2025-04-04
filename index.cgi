@@ -2,7 +2,7 @@
 #!/usr/bin/python3
 #===============================
 # Test API
-# Copyright 2022 Takashi Harano
+# Copyright 2025 Takashi Harano
 # Released under the MIT license
 #===============================
 import os
@@ -15,7 +15,9 @@ import util
 util.append_system_path(__file__, './postalcode')
 import postalcode
 
-def hello():
+DATA_FILE_PATH = './_data_.txt'
+
+def proc_hello():
     name = util.get_request_param('name', '');
     text = 'Hello'
     if name != '':
@@ -66,6 +68,38 @@ def proc_status():
 def proc_postalcode():
     postalcode.webmain()
 
+def send_response_from_data():
+    header = ''
+    body = ''
+
+    data = util.read_text_file(DATA_FILE_PATH, '')
+    pos = data.find("\n\n")
+
+    if pos >= 0:
+        header = data[:pos] + '\n'
+        body = data[pos + 2:]
+    else:
+        header = data
+
+    header_lines = util.text2list(header)
+    status_line = header_lines[0]
+
+    status_code = util.extract_string(status_line, r'.+([0-9]{3}).+')
+    try:
+        status = int(status_code)
+    except:
+        status = 200
+
+    headers = []
+    for i in range(1, len(header_lines)):
+        header_field = header_lines[i]
+        fields = header_field.split(': ')
+        name = fields[0]
+        value = fields[1]
+        headers.append({name: value})
+
+    util.send_response(body, status=status, headers=headers)
+
 #----------------------------------------------------------
 def main():
     api = util.get_request_param('api', '');
@@ -75,6 +109,6 @@ def main():
     if func_name in g:
         g[func_name]()
     else:
-        hello()
+        send_response_from_data()
 
 main()
