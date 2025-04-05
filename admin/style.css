@@ -1,6 +1,7 @@
 html, body {
   width: 100%;
   height: calc(100vh - 20px);
+  min-width: 1000px;
   margin: 0;
   background: #1e1e1e;
   color: #ddd;
@@ -98,6 +99,7 @@ button:disabled, input[type="button"]:disabled, input[type="submit"]:disabled {
 #header-line {
   background: #008;
   padding: 2px;
+  margin-bottom: 16px;
 }
 
 #title {
@@ -109,7 +111,7 @@ button:disabled, input[type="button"]:disabled, input[type="submit"]:disabled {
   right: 10px;
 }
 
-#status {
+#status-code {
   width: 50px;
 }
 
@@ -131,7 +133,7 @@ button:disabled, input[type="button"]:disabled, input[type="submit"]:disabled {
 
 #data-body-wrappeer {
   width: 100%;
-  height: calc(70% - 60px);
+  height: calc(70% - 40px);
 }
 
 #data-body {
