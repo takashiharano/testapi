@@ -1,8 +1,8 @@
 /*!
  * Copyright 2025 Takashi Harano
  */
-var apiadmin = {};
-var scnjs = apiadmin;
+var apieditor = {};
+var scnjs = apieditor;
 
 scnjs.HTTP_STATUS = {
   100: 'Continue',
@@ -50,7 +50,7 @@ scnjs.HTTP_STATUS = {
 
 $onReady = function() {
   util.clock('#clock', '%YYYY-%MM-%DD %W %HH:%mm:%SS %Z');
-  var url = location.href.replace(/admin\/$/, '');
+  var url = location.href.replace(/editor\/$/, '');
   var urlLabel = scnjs.buildCopyableLabel(url);
   $el('#url').innerHTML = urlLabel;
   util.textarea.addStatusInfo('#data-body', '#textareainfo');
@@ -186,13 +186,20 @@ scnjs.setData = function(h, b) {
 };
 
 scnjs.onStatusSet = function() {
-  scnjs.setStatus($el('#status-code').value);
+  var status = $el('#status-code').value.trim();
+  if (status.match(/[0-9]{3}/)) {
+    scnjs.setStatus(status);
+    $el('#status').value = '';
+  } else {
+    scnjs.showInfotip('Status code must be 3 digit number');
+  }
 };
 
 scnjs.onStatusSelected = function() {
   var status = $el('#status').value;
   if (status) {
     scnjs.setStatus(status);
+    $el('#status-code').value = '';
   }
 };
 
@@ -258,7 +265,7 @@ scnjs.callApi = function(act, params, cb) {
 scnjs.showInfotip = function(m, d, o) {
   if (!o) o = {};
   o.style = {
-    'font-size': '14px'
+    'font-size': '16px'
   };
   util.infotip.show(m, d, o);
 };

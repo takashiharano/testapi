@@ -23,32 +23,34 @@ def build_main_screen(context):
 <meta name="referrer" content="never">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 '''
-    html += '<title>Test API Admin</title>'
+    html += '<title>Test API Editor</title>'
     html += '<link rel="stylesheet" href="style.css" />'
     html += '<script src="' + ROOT_PATH + 'libs/sha.js"></script>'
     html += '<script src="' + ROOT_PATH + 'libs/debug.js"></script>'
     html += '<script src="' + ROOT_PATH + 'libs/util.js"></script>'
     html += '<script src="' + ROOT_PATH + 'websys/websys.js"></script>'
-    html += '<script src="apiadmin.js"></script>'
+    html += '<script src="apieditor.js"></script>'
     html += '''<script src="./?res=js"></script>
 </head>
 <body>
 <div id="body1">
 <div id="header-line">
-<span id="title">API EMULATOR - RESPONSE EDITOR</span>
-<span style="margin-left:16px;">API URL <span id="url"></span></span>
+<div id="header-content">
+<span id="title" style="margin-left:8px;"><span id="api">API</span> Emulator - Response Editor</span>
+<span id="url-info" style="margin-left:16px;">API URL <span id="url"></span></span>
 <span id="clock"></span>
 </div>
-
+</div>
+<div id="content-wrapper">
 <div style="margin-top:8px;margin-bottom:4px;">
-<button onclick="apiadmin.reload();">Reload</button>
+<button onclick="scnjs.reload();">Reload</button>
 <span style="margin-left:16px;">
-<button onclick="apiadmin.saveData();">Save</button>
+<button onclick="scnjs.saveData();">Save</button>
 </span>
 
 <span style="margin-left:32px;">
 Status: 
-<select id="status" onchange="apiadmin.onStatusSelected();">
+<select id="status" onchange="scnjs.onStatusSelected();">
 <option value=""></option>
 <optgroup label="1. Informational responses">
   <option value="100">100 Continue</option>
@@ -103,31 +105,32 @@ Status:
 </optgroup>
 </select>
 
-<input type="text" id="status-code"><button onclick="apiadmin.onStatusSet();" style="margin-left:4px;">Set</button>
+<input type="text" id="status-code" spellcheck="false"><button onclick="scnjs.onStatusSet();" style="margin-left:4px;">Set</button>
 </span>
 
 <span style="margin-left:32px;">
-<button onclick="apiadmin.setDateField();">Set Date:</button>
+<button onclick="scnjs.setDateField();">Set Date:</button>
 </span>
 
 <span style="margin-left:32px;">
-<button onclick="apiadmin.set200json();">200 OK JSON</button>
+<button onclick="scnjs.set200json();">200 OK JSON</button>
 </span>
 </div>
 
 <div id="data-area">
 <div><span class="item-name">Headers</span></div>
 <div id="data-header-wrappeer">
-<textarea id="data-header"></textarea>
+<textarea id="data-header" spellcheck="false"></textarea>
 </div>
 
 <div style="margin-top:16px;"><span class="item-name">Body</span></div>
 <div id="data-body-wrappeer">
-<textarea id="data-body" oninput="apiadmin.onDataBodyChange();" onchange="apiadmin.onDataBodyChange();"></textarea>
+<textarea id="data-body" oninput="scnjs.onDataBodyChange();" onchange="scnjs.onDataBodyChange();" spellcheck="false"></textarea>
 <div id="textareainfo"></div>
 </div>
 </div>
 
+</div>
 </div>
 </body>
 </html>'''
@@ -141,7 +144,7 @@ def build_forbidden_screen(context):
 <meta name="referrer" content="never">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 '''
-    html += '<title>Test API Admin</title>'
+    html += '<title>Test API Editor</title>'
     html += '<link rel="stylesheet" href="style.css" />'
     html += '<script src="' + ROOT_PATH + 'libs/debug.js"></script>'
     html += '<script src="' + ROOT_PATH + 'libs/util.js"></script>'

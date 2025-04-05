@@ -3,10 +3,10 @@ html, body {
   height: calc(100vh - 20px);
   min-width: 1000px;
   margin: 0;
-  background: #1e1e1e;
-  color: #ddd;
+  background: #fff;
+  color: #1b1b1b;
   font-size: 16px;
-  font-family: Consolas, Monaco, Menlo, monospace, sans-serif;
+  font-family: Verdana;
 }
 
 a {
@@ -36,14 +36,15 @@ a:hover:after {
 input[type="text"], input[type="password"] {
   border: none;
   border-bottom: solid 1px #ccc;
-  font-family: Consolas, Monaco, Menlo, monospace, sans-serif;
   background: transparent;
-  color: #ddd;
+  color: #1b1b1b;
   font-size: 16px;
   outline: none;
 }
-input[type="text"]:disabled, input[type="password"]:disabled {
-  color: #eee;
+
+input[type="text"]:focus, textarea:focus {
+  border-color: #ccc;
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / .075), 0 0px 5px rgb(128 128 128 / .5);
 }
 
 input:-webkit-autofill {
@@ -52,13 +53,22 @@ input:-webkit-autofill {
 }
 
 textarea {
+  border: solid 1px #ccc;
   border-radius: 3px;
   outline: none;
   background: transparent;
   padding: 4px;
-  color: #ddd;
+  color: #1b1b1b;
   font-size: 16px;
   font-family: Consolas, Monaco, Menlo, monospace, sans-serif;
+}
+
+select {
+  height: 28px;
+  border: solid 1px #ccc;
+  border-radius: 6px;
+  outline: none;
+  font-size: 16px;
 }
 
 pre {
@@ -68,47 +78,68 @@ pre {
 }
 
 button, input[type="button"], input[type="submit"] {
+  height: 28px;
   min-width: 64px;
   border: none;
-  border-radius: 2px;
+  border-radius: 6px;
   outline: none;
   color: #fff;
-  background: #06c;
+  background: #097bed;
   font-size: 16px;
-  font-family: Consolas, Monaco, Menlo, monospace, sans-serif;
   transition: all 0.2s ease;
 }
+
 button:hover, input[type="button"]:hover, input[type="submit"]:hover {
   cursor: pointer;
   background: #0af;
   color: #fff;
   transition: all 0.2s ease;
 }
-button:disabled, input[type="button"]:disabled, input[type="submit"]:disabled {
-  color: #aaa;
-  background: #444;
-}
-
-.button-red {
-  background: #a00;
-}
-.button-red:hover {
-  background: #d55;
-}
 
 #header-line {
-  background: #008;
+  position: relative;
+  display: table;
+  width: calc(100% - 4px);
+  height: 46px;
+  background: #333;
+  color: #fff;
   padding: 2px;
   margin-bottom: 16px;
+}
+
+#header-content {
+  position: relative;
+  display: table-cell;
+  vertical-align: middle;
 }
 
 #title {
   color: #fff;
 }
 
+#api {
+  color: #F480FF;
+}
+
+#url-info {
+  font-size: 14px;
+}
+
+#url {
+  margin-left: 4px;
+  color: #8CD4FF;
+  font-family: Consolas, Monaco, Menlo, monospace, sans-serif;
+}
+
 #clock {
   position: absolute;
   right: 10px;
+  color: #dedede;
+  font-family: Consolas, Monaco, Menlo, monospace, sans-serif;
+}
+
+#content-wrapper {
+  padding: 0 8px;
 }
 
 #status-code {
@@ -116,7 +147,7 @@ button:disabled, input[type="button"]:disabled, input[type="submit"]:disabled {
 }
 
 #data-area {
-  width: calc(100vw - 17px);
+  width: calc(100vw - 28px);
   height: calc(100vh - 128px);
 }
 
@@ -133,7 +164,7 @@ button:disabled, input[type="button"]:disabled, input[type="submit"]:disabled {
 
 #data-body-wrappeer {
   width: 100%;
-  height: calc(70% - 40px);
+  height: calc(70% - 90px);
 }
 
 #data-body {
@@ -143,9 +174,11 @@ button:disabled, input[type="button"]:disabled, input[type="submit"]:disabled {
 }
 
 #textareainfo {
-  color: #ccc;
+  color: #4e4e4e;
+  font-size: 14px;
+  font-family: Consolas, Monaco, Menlo, monospace, sans-serif;
 }
 
 .item-name {
-  color: #aac;
+  color: #70706b;
 }

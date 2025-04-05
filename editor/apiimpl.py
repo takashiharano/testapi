@@ -1,5 +1,5 @@
 #==============================================================================
-# API EMULATOR - RESPONSE SETTER
+# API EMULATOR - RESPONSE EDITOR
 # Copyright 2025 Takashi Harano
 #==============================================================================
 import os
