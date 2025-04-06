@@ -56,6 +56,16 @@ def build_main_screen(context):
 
 <span style="margin-left:16px;">
 Status:
+<span>
+<button onclick="scnjs.onSetStatusButton(200);">200</button>
+<button onclick="scnjs.onSetStatusButton(301);">301</button>
+<button onclick="scnjs.onSetStatusButton(401);">401</button>
+<button onclick="scnjs.onSetStatusButton(403);">403</button>
+<button onclick="scnjs.onSetStatusButton(404);">404</button>
+<button onclick="scnjs.onSetStatusButton(500);">500</button>
+<button onclick="scnjs.onSetStatusButton(503);">503</button>
+</span>
+
 <input type="text" id="status-code" spellcheck="false"><button onclick="scnjs.onStatusSet();" style="margin-left:4px;">Set</button>
 <select id="status" onchange="scnjs.onStatusSelected();">
 <option value=""></option>
@@ -111,10 +121,6 @@ Status:
   <option value="505">505 HTTP Version not supported</option>
 </optgroup>
 </select>
-</span>
-
-<span style="margin-left:16px;">
-<button onclick="scnjs.set200json();">200 OK JSON</button>
 </span>
 
 <span style="margin-left:24px;">

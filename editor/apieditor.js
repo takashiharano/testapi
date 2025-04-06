@@ -48,13 +48,18 @@ scnjs.HTTP_STATUS_MESSAGES = {
   505: 'HTTP Version not supported'
 };
 
-scnjs.autoReload = false;
+scnjs.ST_NONE = 0;
+scnjs.ST_INITIALIED = 1;
 scnjs.INTERVAL = 3000;
+scnjs.apiurl = '';
+scnjs.autoReload = false;
+scnjs.status = scnjs.ST_NONE;
 
 $onReady = function() {
   util.clock('#clock', '%YYYY-%MM-%DD %W %HH:%mm:%SS %Z');
 
   var url = location.href.replace(/editor\/$/, '');
+  scnjs.apiurl = url;
   var urlLabel = scnjs.buildCopyableLabel(url);
   $el('#url').innerHTML = urlLabel;
 
@@ -104,7 +109,12 @@ scnjs.getDataCb = function(xhr, res, req) {
   var body = data.body;
   $el('#data-header').value = header;
   $el('#data-body').value = body;
-  scnjs.showInfotip('Data Loaded');
+
+  if (scnjs.status & scnjs.ST_INITIALIED) {
+    scnjs.showInfotip('Data Loaded');
+  } else {
+    scnjs.status |= scnjs.ST_INITIALIED;
+  }
 };
 
 scnjs.saveData = function() {
@@ -149,53 +159,96 @@ scnjs.getRfc822DateString = function(t) {
   return d;
 };
 
-scnjs.set200json = function() {
-  var d = scnjs.getRfc822DateString();
-
-  var b = '{"message":"Hello, World!"}';
-
-  var contentLen = util.lenB(b);
-
-  var h = '';
-  h += 'HTTP/1.1 200 OK\n';
-  h += 'Date: ' + d + '\n';
-  h += 'Content-Type: application/json\n';
-  h += 'Content-Length: ' + contentLen + '\n';
-
-  scnjs.setData(h, b);
+scnjs.buildBodyTemplate = function(status, statusMessage) {
+  if (status == 200) {
+    return scnjs.buildBodyTemplate200();
+  }
+  var s = '';
+  s += '<!DOCTYPE html>\n';
+  s += '<html>\n';
+  s += '<head>\n';
+  s += '<title>' + statusMessage + '</title>\n';
+  s += '<meta charset="utf-8">\n';
+  s += '</head>\n';
+  s += '<body>\n';
+  s += '<h1>' + statusMessage + '</h1>\n';
+  s += '</body>\n';
+  s += '</html>\n';
+  return s;
 };
 
-scnjs.setStatus = function(status) {
+scnjs.buildBodyTemplate200 = function() {
+  return '{"message":"Hello, World!"}';
+};
+
+scnjs.onSetStatusButton = function(status) {
+  scnjs.setResponseTemplate(status);
+  $el('#status').value = '';
+  $el('#status-code').value = '';
+};
+
+scnjs.setResponseTemplate = function(status) {
+  status |= 0;
+
   var message = scnjs.HTTP_STATUS_MESSAGES[status];
   if (!message) message = 'Unknown';
-  scnjs.setDefaultData(status, message);
-};
 
-scnjs.setDefaultData = function(status, message) {
   var d = scnjs.getRfc822DateString();
   var statusMessage = status + ' ' + message;
 
   var b = '';
-  if (!((status == 204) || (status == 304))) {
-    b += '<!DOCTYPE html>\n';
-    b += '<html>\n';
-    b += '<head>\n';
-    b += '<title>' + statusMessage + '</title>\n';
-    b += '<meta charset="utf-8">\n';
-    b += '</head>\n';
-    b += '<body>\n';
-    b += '<h1>' + statusMessage + '</h1>\n';
-    b += '</body>\n';
-    b += '</html>\n';
+  if (scnjs.isBodyRequired(status)) {
+    b += scnjs.buildBodyTemplate(status, statusMessage);
   }
 
-  var h = '';
-  h += 'HTTP/1.1 ' + statusMessage + '\n';
-  h += 'Date: ' + d + '\n';
-  h += 'Content-Type: text/html; charset=UTF-8\n';
-  h += 'Content-Length: ' + util.lenB(b) + '\n';
+  var h = 'HTTP/1.1 ' + statusMessage + '\n';
+
+  if (scnjs.isDateHeaderRequired(status)) {
+    h += 'Date: ' + d + '\n';
+  }
+
+  switch (status) {
+    case 301:
+    case 302:
+    case 307:
+      var url = scnjs.apiurl + 'testpage.html';
+      h += 'Location: ' + url + '\n';
+      break;
+    case 401:
+      h += 'WWW-Authenticate: Basic\n';
+      break;
+  }
+
+  if (scnjs.isContentHeaderRequired(status)) {
+    var contentType = scnjs.getContentType(status);
+    h += 'Content-Type: ' + contentType + '\n';
+    h += 'Content-Length: ' + util.lenB(b) + '\n';
+  }
 
   scnjs.setData(h, b);
+};
+
+scnjs.isDateHeaderRequired = function(status) {
+  var excludeStatus = [300, 301, 302, 307];
+  return !excludeStatus.includes(status);
+};
+
+scnjs.isContentHeaderRequired = function(status) {
+  var excludeStatus= [300, 301, 302, 307, 401];
+  return !excludeStatus.includes(status);
+};
+
+scnjs.getContentType = function(status) {
+  var contentType = 'text/html; charset=UTF-8';
+  if (status == 200) {
+    contentType = 'application/json';
+  }
+  return contentType;
+};
+
+scnjs.isBodyRequired = function(status) {
+  var excludeStatus = [204, 300, 301, 302, 307, 304, 401];
+  return !excludeStatus.includes(status);
 };
 
 scnjs.setData = function(h, b) {
@@ -206,7 +259,7 @@ scnjs.setData = function(h, b) {
 scnjs.onStatusSet = function() {
   var status = $el('#status-code').value.trim();
   if (status.match(/[0-9]{3}/)) {
-    scnjs.setStatus(status);
+    scnjs.setResponseTemplate(status);
     $el('#status').value = '';
   } else {
     scnjs.showInfotip('Status code must be 3 digit number');
@@ -216,7 +269,7 @@ scnjs.onStatusSet = function() {
 scnjs.onStatusSelected = function() {
   var status = $el('#status').value;
   if (status) {
-    scnjs.setStatus(status);
+    scnjs.setResponseTemplate(status);
     $el('#status-code').value = '';
   }
 };
