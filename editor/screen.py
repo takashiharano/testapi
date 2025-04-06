@@ -41,15 +41,22 @@ def build_main_screen(context):
 <span id="clock"></span>
 </div>
 </div>
+
 <div id="content-wrapper">
+<div>
+<span id="led1" style="margin-right:4px;"></span><span class="item-name">Access Log</span>
+<button class="button-small" onclick="scnjs.clearAccessLog();">Clear</button>
+<div id="console-area"><pre id="log-console"></pre></div>
+</div>
+
 <div style="margin-top:8px;margin-bottom:4px;">
-<button onclick="scnjs.reload();">Reload</button>
-<span style="margin-left:16px;">
-<button onclick="scnjs.saveData();">Save</button>
+<span>
+<button class="button-large button-blue" onclick="scnjs.saveData();">Save</button>
 </span>
 
-<span style="margin-left:32px;">
-Status: 
+<span style="margin-left:16px;">
+Status:
+<input type="text" id="status-code" spellcheck="false"><button onclick="scnjs.onStatusSet();" style="margin-left:4px;">Set</button>
 <select id="status" onchange="scnjs.onStatusSelected();">
 <option value=""></option>
 <optgroup label="1. Informational responses">
@@ -104,16 +111,18 @@ Status:
   <option value="505">505 HTTP Version not supported</option>
 </optgroup>
 </select>
-
-<input type="text" id="status-code" spellcheck="false"><button onclick="scnjs.onStatusSet();" style="margin-left:4px;">Set</button>
 </span>
 
-<span style="margin-left:32px;">
+<span style="margin-left:16px;">
+<button onclick="scnjs.set200json();">200 OK JSON</button>
+</span>
+
+<span style="margin-left:24px;">
 <button onclick="scnjs.setDateField();">Set Date:</button>
 </span>
 
-<span style="margin-left:32px;">
-<button onclick="scnjs.set200json();">200 OK JSON</button>
+<span style="margin-left:24px;">
+<button onclick="scnjs.reload();">Reload</button>
 </span>
 </div>
 

@@ -4,7 +4,7 @@
 var apieditor = {};
 var scnjs = apieditor;
 
-scnjs.HTTP_STATUS = {
+scnjs.HTTP_STATUS_MESSAGES = {
   100: 'Continue',
   101: 'Switching Protocols',
   200: 'OK',
@@ -48,13 +48,31 @@ scnjs.HTTP_STATUS = {
   505: 'HTTP Version not supported'
 };
 
+scnjs.autoReload = false;
+scnjs.INTERVAL = 3000;
+
 $onReady = function() {
   util.clock('#clock', '%YYYY-%MM-%DD %W %HH:%mm:%SS %Z');
+
   var url = location.href.replace(/editor\/$/, '');
   var urlLabel = scnjs.buildCopyableLabel(url);
   $el('#url').innerHTML = urlLabel;
+
+  scnjs.led1 = new util.Led('#led1');
+  scnjs.console1 = util.initConsole('#log-console');
+
   util.textarea.addStatusInfo('#data-body', '#textareainfo');
   $el('#data-header').focus();
+
+  scnjs.startAutoReload();
+};
+
+scnjs.printLog = function(s) {
+  scnjs.console1.print(s);
+};
+
+scnjs.writeLog = function(s) {
+  scnjs.console1.write(s);
 };
 
 scnjs.onSysReady = function() {
@@ -148,7 +166,7 @@ scnjs.set200json = function() {
 };
 
 scnjs.setStatus = function(status) {
-  var message = scnjs.HTTP_STATUS[status];
+  var message = scnjs.HTTP_STATUS_MESSAGES[status];
   if (!message) message = 'Unknown';
   scnjs.setDefaultData(status, message);
 };
@@ -240,6 +258,98 @@ scnjs.onDataBodyChange = function() {
   scnjs.setHeaderField('Content-Length', b, -1);
 };
 
+//-----------------------------------------------------------------------------
+scnjs.getAccessLog = function() {
+  scnjs.callApi('get_accesslog', null, scnjs.getAccessLogCb);
+};
+scnjs.getAccessLogCb = function(xhr, res, req) {
+  if (xhr.status != 200) {
+    scnjs.showInfotip('HTTP ' + xhr.status);
+    scnjs.onError();
+    return;
+  }
+  if (res.status == 'FORBIDDEN') {
+    location.href = location.href;
+    return;
+  } else if (res.status != 'OK') {
+    scnjs.showInfotip(res.status);
+    return;
+  }
+  var logs = res.body;
+  scnjs.printAccessLog(logs);
+};
+scnjs.printAccessLog = function(logs) {
+  var s = '';
+  var a = util.text2list(logs);
+  for (var i = 0; i < a.length; i++) {
+    var line = a[i];
+    var fields = line.split('\t');
+    var timestamp = +fields[0];
+    var method = fields[1];
+    var status = fields[2];
+    var addr = fields[3];
+    var ua = fields[4];
+    var bLen = fields[5];
+
+    var dt = util.getDateTimeString(timestamp, '%YYYY-%MM-%DD %HH:%mm:%SS.%sss');
+    var message = scnjs.HTTP_STATUS_MESSAGES[status];
+
+    var statusClass = 'status-ok';
+    if (!(status.startsWith('1') || status.startsWith('2'))) {
+      statusClass = 'status-err';
+    }
+
+    var txt = dt + '\t' + method + '\t' + status + ' ' + message + '\t' + addr + '\t' + ua + '\t' + bLen + ' bytes'
+    s += txt + '\n';
+  }
+  s = util.alignFields(s, '\t', 2);
+  s = s.replace(/(  )([2].. .+?)(  )/g, '$1<span class="status-ok">$2</span>$3');
+  s = s.replace(/(  )([4-9].. .+?)(  )/g, '$1<span class="status-err">$2</span>$3');
+  scnjs.writeLog(s);
+  util.IntervalProc.next('getlog');
+};
+
+scnjs.clearAccessLog = function() {
+  scnjs.callApi('clear_accesslog', null, scnjs.clearAccessLogCb);
+};
+scnjs.clearAccessLogCb = function(xhr, res, req) {
+  if (xhr.status != 200) {
+    scnjs.showInfotip('HTTP ' + xhr.status);
+    scnjs.onError();
+    return;
+  }
+  if (res.status == 'OK') {
+    scnjs.writeLog('');
+  } else if (res.status == 'FORBIDDEN') {
+    location.href = location.href;
+  } else {
+    scnjs.showInfotip(res.status);
+  }
+};
+
+scnjs.startAutoReload = function() {
+  scnjs.autoReload = true;
+  var updateInterval = scnjs.INTERVAL;
+  util.IntervalProc.start('getlog', scnjs.procInterval, updateInterval, null, true);
+  scnjs.led1.on();
+};
+
+scnjs.stopAutoReload = function() {
+  scnjs.autoReload = false;
+  scnjs.led1.off();
+};
+
+scnjs.procInterval = function() {
+  if (scnjs.autoReload) {
+    scnjs.getAccessLog();
+  }
+};
+
+scnjs.onError = function() {
+  scnjs.stopAutoReload();
+};
+
+//-----------------------------------------------------------------------------
 scnjs.http = function(req, cb) {
   req.cb = cb;
   websys.http(req);

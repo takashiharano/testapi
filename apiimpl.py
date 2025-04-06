@@ -17,6 +17,7 @@ except:
     pass
 
 DATA_FILE_PATH = './_data_.txt'
+LOG_FILE_PATH = './_access.log'
 
 #------------------------------------------------------------------------------
 def api_hello():
@@ -108,7 +109,19 @@ def send_response_from_data():
         value = fields[1]
         headers.append({name: value})
 
+    write_accesslog(status, body)
     util.send_response(body, status=status, headers=headers)
+
+def write_accesslog(status, body):
+    now = util.get_unixtime_millis()
+    method = os.environ.get('REQUEST_METHOD', '')
+    addr = os.environ.get('REMOTE_ADDR', '')
+    ua = os.environ.get('HTTP_USER_AGENT', '')
+    content_len = 0
+    if body is not None:
+        content_len = len(body)
+    log_text = str(now) + '\t' + method + '\t' + str(status) + '\t' + addr + '\t' + ua + '\t' + str(content_len)
+    util.append_line_to_text_file(LOG_FILE_PATH, log_text, max=100)
 
 #----------------------------------------------------------
 def main():

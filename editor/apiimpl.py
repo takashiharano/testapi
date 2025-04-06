@@ -17,6 +17,7 @@ DATA_DIR = util.get_relative_path(__file__, '../../../private/websys/')
 GROUPS_DATA_FILE_PATH = DATA_DIR + 'groups.json'
 
 DATA_FILE_PATH = '../_data_.txt'
+LOG_FILE_PATH = '../_access.log'
 
 #------------------------------------------------------------------------------
 # Returns None if the value not found
@@ -75,6 +76,15 @@ def proc_save_data(context):
         status = 'ERROR'
         body = str(e)
     websys.send_result_json(status, body=body)
+
+#------------------------------------------------------------------------------
+def proc_get_accesslog(context):
+    data = util.read_text_file(LOG_FILE_PATH, '')
+    websys.send_result_json('OK', body=data)
+
+def proc_clear_accesslog(context):
+    util.write_text_file(LOG_FILE_PATH, '')
+    websys.send_result_json('OK', body=None)
 
 #------------------------------------------------------------------------------
 def proc_api(context, act):
