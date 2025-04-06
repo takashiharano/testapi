@@ -163,6 +163,14 @@ button:hover, input[type="button"]:hover, input[type="submit"]:hover {
   font-family: Consolas, Monaco, Menlo, monospace, sans-serif;
 }
 
+.status-ok {
+  color: #12c620;
+}
+
+.status-err {
+  color: #cb9273;
+}
+
 #data-header-wrappeer {
   width: 100%;
   height: 25%;
@@ -194,12 +202,4 @@ button:hover, input[type="button"]:hover, input[type="submit"]:hover {
 .item-name {
   color: #70706b;
   font-size: 14px;
-}
-
-.status-ok {
-  color: #0c0;
-}
-
-.status-err {
-  color: #cb9273;
 }
