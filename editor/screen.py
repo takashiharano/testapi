@@ -57,13 +57,13 @@ def build_main_screen(context):
 <span style="margin-left:16px;">
 Status:
 <span>
-<button onclick="scnjs.onSetStatusButton(200);">200</button>
-<button onclick="scnjs.onSetStatusButton(301);">301</button>
-<button onclick="scnjs.onSetStatusButton(401);">401</button>
-<button onclick="scnjs.onSetStatusButton(403);">403</button>
-<button onclick="scnjs.onSetStatusButton(404);">404</button>
-<button onclick="scnjs.onSetStatusButton(500);">500</button>
-<button onclick="scnjs.onSetStatusButton(503);">503</button>
+<button onclick="scnjs.onSetStatusButton(200);" data-tooltip2="200 OK">200</button>
+<button onclick="scnjs.onSetStatusButton(301);" data-tooltip2="301 Moved Permanently">301</button>
+<button onclick="scnjs.onSetStatusButton(401);" data-tooltip2="401 Unauthorized">401</button>
+<button onclick="scnjs.onSetStatusButton(403);" data-tooltip2="403 Forbidden">403</button>
+<button onclick="scnjs.onSetStatusButton(404);" data-tooltip2="404 Not Found">404</button>
+<button onclick="scnjs.onSetStatusButton(500);" data-tooltip2="500 Internal Server Error">500</button>
+<button onclick="scnjs.onSetStatusButton(503);" data-tooltip2="503 Service Unavailable">503</button>
 </span>
 
 <input type="text" id="status-code" spellcheck="false"><button onclick="scnjs.onStatusSet();" style="margin-left:4px;">Set</button>
@@ -124,7 +124,7 @@ Status:
 </span>
 
 <span style="margin-left:24px;">
-<button onclick="scnjs.setDateField();">Set Date:</button>
+<button onclick="scnjs.setDateField();" data-tooltip="Set current date-time to Date field">Set Date:</button>
 </span>
 
 <span style="margin-left:24px;">
