@@ -140,6 +140,7 @@ button:hover, input[type="button"]:hover, input[type="submit"]:hover {
 }
 
 #url-info {
+  color: #ccc;
   font-size: 14px;
 }
 
