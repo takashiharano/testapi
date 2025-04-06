@@ -56,6 +56,7 @@ scnjs.autoReload = false;
 scnjs.status = scnjs.ST_NONE;
 
 $onReady = function() {
+  dbg.init({zoom: 1.4});
   util.clock('#clock', '%YYYY-%MM-%DD %W %HH:%mm:%SS %Z');
 
   var url = location.href.replace(/editor\/$/, '');
@@ -322,7 +323,11 @@ scnjs.getAccessLog = function() {
 };
 scnjs.getAccessLogCb = function(xhr, res, req) {
   if (xhr.status != 200) {
-    scnjs.showInfotip('HTTP ' + xhr.status);
+    var m = 'HTTP ' + xhr.status;
+    if (xhr.status == 0) {
+      m = 'CONNECTION ERROR';
+    }
+    scnjs.showInfotip(m);
     scnjs.onError();
     return;
   }
@@ -372,7 +377,11 @@ scnjs.clearAccessLog = function() {
 };
 scnjs.clearAccessLogCb = function(xhr, res, req) {
   if (xhr.status != 200) {
-    scnjs.showInfotip('HTTP ' + xhr.status);
+    var m = 'HTTP ' + xhr.status;
+    if (xhr.status == 0) {
+      m = 'CONNECTION ERROR';
+    }
+    scnjs.showInfotip(m);
     scnjs.onError();
     return;
   }
@@ -405,6 +414,7 @@ scnjs.procInterval = function() {
 
 scnjs.onError = function() {
   scnjs.stopAutoReload();
+  scnjs.led1.on('#ffa0a0');
 };
 
 //-----------------------------------------------------------------------------
