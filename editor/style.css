@@ -166,7 +166,7 @@ button:hover, input[type="button"]:hover, input[type="submit"]:hover {
 
 #data-area {
   width: calc(100vw - 28px);
-  height: calc(100vh - 230px);
+  height: calc(100vh - 240px);
 }
 
 #console-area {
@@ -199,7 +199,7 @@ button:hover, input[type="button"]:hover, input[type="submit"]:hover {
 
 #data-body-wrappeer {
   width: 100%;
-  height: calc(70% - 40px);
+  height: calc(70% - 55px);
 }
 
 #data-body {
