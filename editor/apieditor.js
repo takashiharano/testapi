@@ -50,7 +50,7 @@ scnjs.HTTP_STATUS_MESSAGES = {
 
 scnjs.ST_NONE = 0;
 scnjs.ST_INITIALIED = 1;
-scnjs.INTERVAL = 3000;
+scnjs.INTERVAL = 1500;
 scnjs.apiurl = '';
 scnjs.autoReload = false;
 scnjs.status = scnjs.ST_NONE;
@@ -187,11 +187,16 @@ scnjs.onSetStatusButton = function(status) {
   $el('#status-code').value = '';
 };
 
+scnjs.getHttpStatusMessage = function(status) {
+  var message = scnjs.HTTP_STATUS_MESSAGES[status];
+  if (!message) message = 'Unknown';
+  return message;
+};
+
 scnjs.setResponseTemplate = function(status) {
   status |= 0;
 
-  var message = scnjs.HTTP_STATUS_MESSAGES[status];
-  if (!message) message = 'Unknown';
+  var message = scnjs.getHttpStatusMessage(status);
 
   var d = scnjs.getRfc822DateString();
   var statusMessage = status + ' ' + message;
@@ -345,7 +350,7 @@ scnjs.printAccessLog = function(logs) {
     var bLen = fields[5];
 
     var dt = util.getDateTimeString(timestamp, '%YYYY-%MM-%DD %HH:%mm:%SS.%sss');
-    var message = scnjs.HTTP_STATUS_MESSAGES[status];
+    var message = scnjs.getHttpStatusMessage(status);
 
     var statusClass = 'status-ok';
     if (!(status.startsWith('1') || status.startsWith('2'))) {
