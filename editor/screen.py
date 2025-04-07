@@ -29,7 +29,7 @@ def build_main_screen(context):
     html += '<script src="' + ROOT_PATH + 'libs/debug.js"></script>'
     html += '<script src="' + ROOT_PATH + 'libs/util.js"></script>'
     html += '<script src="' + ROOT_PATH + 'websys/websys.js"></script>'
-    html += '<script src="apieditor.js"></script>'
+    html += '<script src="main.js"></script>'
     html += '''<script src="./?res=js"></script>
 </head>
 <body>
@@ -45,29 +45,29 @@ def build_main_screen(context):
 <div id="content-wrapper">
 <div>
 <span id="led1" style="margin-right:4px;"></span><span class="item-name">Access Log</span>
-<button class="button-small" onclick="scnjs.clearAccessLog();">Clear</button>
+<button class="button-small" onclick="main.clearAccessLog();">Clear</button>
 <div id="console-area"><pre id="log-console"></pre></div>
 </div>
 
 <div style="margin-top:8px;margin-bottom:4px;">
 <span>
-<button class="button-large button-blue" onclick="scnjs.save();">Save</button>
+<button class="button-large button-blue" onclick="main.save();">Save</button>
 </span>
 
 <span style="margin-left:16px;">
 Status:
 <span>
-<button id="button-200" class="status-button" onclick="scnjs.onSetStatusButton(200);" data-tooltip2="200 OK">200</button>
-<button id="button-301" class="status-button" onclick="scnjs.onSetStatusButton(301);" data-tooltip2="301 Moved Permanently">301</button>
-<button id="button-401" class="status-button" onclick="scnjs.onSetStatusButton(401);" data-tooltip2="401 Unauthorized">401</button>
-<button id="button-403" class="status-button" onclick="scnjs.onSetStatusButton(403);" data-tooltip2="403 Forbidden">403</button>
-<button id="button-404" class="status-button" onclick="scnjs.onSetStatusButton(404);" data-tooltip2="404 Not Found">404</button>
-<button id="button-500" class="status-button" onclick="scnjs.onSetStatusButton(500);" data-tooltip2="500 Internal Server Error">500</button>
-<button id="button-503" class="status-button" onclick="scnjs.onSetStatusButton(503);" data-tooltip2="503 Service Unavailable">503</button>
+<button id="button-200" class="status-button" onclick="main.onSetStatusButton(200);" data-tooltip2="200 OK">200</button>
+<button id="button-301" class="status-button" onclick="main.onSetStatusButton(301);" data-tooltip2="301 Moved Permanently">301</button>
+<button id="button-401" class="status-button" onclick="main.onSetStatusButton(401);" data-tooltip2="401 Unauthorized">401</button>
+<button id="button-403" class="status-button" onclick="main.onSetStatusButton(403);" data-tooltip2="403 Forbidden">403</button>
+<button id="button-404" class="status-button" onclick="main.onSetStatusButton(404);" data-tooltip2="404 Not Found">404</button>
+<button id="button-500" class="status-button" onclick="main.onSetStatusButton(500);" data-tooltip2="500 Internal Server Error">500</button>
+<button id="button-503" class="status-button" onclick="main.onSetStatusButton(503);" data-tooltip2="503 Service Unavailable">503</button>
 </span>
 
-<input type="text" id="status-code" spellcheck="false"><button onclick="scnjs.onStatusSet();" style="margin-left:4px;">Set</button>
-<select id="status" onchange="scnjs.onStatusSelected();">
+<input type="text" id="status-code" spellcheck="false"><button onclick="main.onStatusSet();" style="margin-left:4px;">Set</button>
+<select id="status" onchange="main.onStatusSelected();">
 <option value=""></option>
 <optgroup label="1. Informational responses">
   <option value="100">100 Continue</option>
@@ -124,11 +124,11 @@ Status:
 </span>
 
 <span style="margin-left:24px;">
-<button onclick="scnjs.setDateField();" data-tooltip="Set current date-time to Date field">Set Date:</button>
+<button onclick="main.setDateField();" data-tooltip="Set current date-time to Date field">Set Date:</button>
 </span>
 
 <span style="margin-left:24px;">
-<button onclick="scnjs.reload();">Reload</button>
+<button onclick="main.reload();">Reload</button>
 </span>
 </div>
 
@@ -140,7 +140,7 @@ Status:
 
 <div style="margin-top:16px;"><span class="item-name">Body</span></div>
 <div id="data-body-wrappeer">
-<textarea id="data-body" oninput="scnjs.onDataBodyChange();" onchange="scnjs.onDataBodyChange();" spellcheck="false"></textarea>
+<textarea id="data-body" oninput="main.onDataBodyChange();" onchange="main.onDataBodyChange();" spellcheck="false"></textarea>
 <div id="textareainfo"></div>
 </div>
 </div>

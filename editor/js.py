@@ -12,8 +12,8 @@ import websys
 
 #------------------------------------------------------------------------------
 def build_js(context):
-    js = 'var apieditor = apieditor || {};'
-    js += 'websys.init(\'' + ROOT_PATH + '/\', apieditor.onSysReady);'
+    js = 'var main = main || {};'
+    js += 'websys.init(\'' + ROOT_PATH + '/\', main.onSysReady);'
     return js
 
 #------------------------------------------------------------------------------
