@@ -84,11 +84,12 @@ def proc_get_accesslog(context):
     a = util.text2list(data)
     if len(a) > 0 and latest_timestamp >= 0:
         latest_line = a[-1]
-        log_fields = latest_line.split('\t')
-        timestamp = int(log_fields[0])
-        if timestamp == latest_timestamp:
-            websys.send_result_json('NOT_MODIFIED', body=None)
-            return
+        if latest_line != '':
+            log_fields = latest_line.split('\t')
+            timestamp = int(log_fields[0])
+            if timestamp == latest_timestamp:
+                websys.send_result_json('NOT_MODIFIED', body=None)
+                return
 
     websys.send_result_json('OK', body=data)
 
