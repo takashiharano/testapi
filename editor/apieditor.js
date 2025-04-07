@@ -55,6 +55,7 @@ scnjs.apiurl = '';
 scnjs.autoReload = false;
 scnjs.status = scnjs.ST_NONE;
 scnjs.latestLogTimestamp = -1;
+scnjs.activeStatus = -1;
 
 $onReady = function() {
   dbg.init({zoom: 1.4});
@@ -88,6 +89,7 @@ scnjs.onSysReady = function() {
 
 scnjs.reload = function() {
   scnjs.getData();
+  scnjs.inActiveButton();
 };
 
 scnjs.getData = function() {
@@ -119,10 +121,24 @@ scnjs.getDataCb = function(xhr, res, req) {
   }
 };
 
+scnjs.save = function() {
+  scnjs.saveData();
+  scnjs.activeStatus = -1;
+  scnjs.activeButton(-1);
+};
+
+scnjs.activeButton = function(status) {
+  scnjs.inActiveButton();
+  $el('#button-' + status).addClass('button-active');
+};
+
+scnjs.inActiveButton = function() {
+  $el('.status-button').removeClass('button-active');
+};
+
 scnjs.saveData = function() {
   var header = $el('#data-header').value;
   var body = $el('#data-body').value;
-
   var param = {
     header: header,
     body: body
@@ -142,7 +158,12 @@ scnjs.saveDataCb = function(xhr, res, req) {
     scnjs.showInfotip(m);
     return;
   }
-  scnjs.showInfotip('Saved');
+  var m = 'Saved';
+  var st = scnjs.activeStatus;
+  if (st >= 0) {
+    m = 'HTTP Status set to ' + st
+  }
+  scnjs.showInfotip(m);
 };
 
 scnjs.getRfc822DateString = function(t) {
@@ -187,6 +208,9 @@ scnjs.onSetStatusButton = function(status) {
   scnjs.setResponseTemplate(status);
   $el('#status').value = '';
   $el('#status-code').value = '';
+  scnjs.saveData();
+  scnjs.activeStatus = status;
+  scnjs.activeButton(status);
 };
 
 scnjs.getHttpStatusMessage = function(status) {
@@ -268,6 +292,7 @@ scnjs.onStatusSet = function() {
   if (status.match(/[0-9]{3}/)) {
     scnjs.setResponseTemplate(status);
     $el('#status').value = '';
+    scnjs.inActiveButton();
   } else {
     scnjs.showInfotip('Status code must be 3 digit number');
   }
@@ -278,6 +303,7 @@ scnjs.onStatusSelected = function() {
   if (status) {
     scnjs.setResponseTemplate(status);
     $el('#status-code').value = '';
+    scnjs.inActiveButton();
   }
 };
 

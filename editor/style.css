@@ -90,6 +90,11 @@ button:hover, input[type="button"]:hover, input[type="submit"]:hover {
   background: #097bed;
 }
 
+.button-active {
+  color: #fff;
+  background: #097bed;
+}
+
 #header-line {
   position: relative;
   display: table;

@@ -51,19 +51,19 @@ def build_main_screen(context):
 
 <div style="margin-top:8px;margin-bottom:4px;">
 <span>
-<button class="button-large button-blue" onclick="scnjs.saveData();">Save</button>
+<button class="button-large button-blue" onclick="scnjs.save();">Save</button>
 </span>
 
 <span style="margin-left:16px;">
 Status:
 <span>
-<button onclick="scnjs.onSetStatusButton(200);" data-tooltip2="200 OK">200</button>
-<button onclick="scnjs.onSetStatusButton(301);" data-tooltip2="301 Moved Permanently">301</button>
-<button onclick="scnjs.onSetStatusButton(401);" data-tooltip2="401 Unauthorized">401</button>
-<button onclick="scnjs.onSetStatusButton(403);" data-tooltip2="403 Forbidden">403</button>
-<button onclick="scnjs.onSetStatusButton(404);" data-tooltip2="404 Not Found">404</button>
-<button onclick="scnjs.onSetStatusButton(500);" data-tooltip2="500 Internal Server Error">500</button>
-<button onclick="scnjs.onSetStatusButton(503);" data-tooltip2="503 Service Unavailable">503</button>
+<button id="button-200" class="status-button" onclick="scnjs.onSetStatusButton(200);" data-tooltip2="200 OK">200</button>
+<button id="button-301" class="status-button" onclick="scnjs.onSetStatusButton(301);" data-tooltip2="301 Moved Permanently">301</button>
+<button id="button-401" class="status-button" onclick="scnjs.onSetStatusButton(401);" data-tooltip2="401 Unauthorized">401</button>
+<button id="button-403" class="status-button" onclick="scnjs.onSetStatusButton(403);" data-tooltip2="403 Forbidden">403</button>
+<button id="button-404" class="status-button" onclick="scnjs.onSetStatusButton(404);" data-tooltip2="404 Not Found">404</button>
+<button id="button-500" class="status-button" onclick="scnjs.onSetStatusButton(500);" data-tooltip2="500 Internal Server Error">500</button>
+<button id="button-503" class="status-button" onclick="scnjs.onSetStatusButton(503);" data-tooltip2="503 Service Unavailable">503</button>
 </span>
 
 <input type="text" id="status-code" spellcheck="false"><button onclick="scnjs.onStatusSet();" style="margin-left:4px;">Set</button>
