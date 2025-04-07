@@ -121,7 +121,7 @@ def write_accesslog(status, body):
     if body is not None:
         content_len = len(body)
     log_text = str(now) + '\t' + method + '\t' + str(status) + '\t' + addr + '\t' + ua + '\t' + str(content_len)
-    util.append_line_to_text_file(LOG_FILE_PATH, log_text, max=100)
+    util.append_line_to_text_file(LOG_FILE_PATH, log_text, max=20)
 
 #----------------------------------------------------------
 def main():

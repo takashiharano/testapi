@@ -24,8 +24,8 @@ LOG_FILE_PATH = '../_access.log'
 def get_request_param(key, default=None):
     return websys.get_request_param(key, default=default)
 
-def get_request_param_as_int(key):
-    return websys.get_request_param_as_int(key)
+def get_request_param_as_int(key, default=0):
+    return websys.get_request_param_as_int(key, default)
 
 def send_result_json(status, body=None):
     websys.send_result_json(status, body)
@@ -80,6 +80,16 @@ def proc_save_data(context):
 #------------------------------------------------------------------------------
 def proc_get_accesslog(context):
     data = util.read_text_file(LOG_FILE_PATH, '')
+    latest_timestamp = get_request_param_as_int('latest_timestamp', -1)
+    a = util.text2list(data)
+    if len(a) > 0 and latest_timestamp >= 0:
+        latest_line = a[-1]
+        log_fields = latest_line.split('\t')
+        timestamp = int(log_fields[0])
+        if timestamp == latest_timestamp:
+            websys.send_result_json('NOT_MODIFIED', body=None)
+            return
+
     websys.send_result_json('OK', body=data)
 
 def proc_clear_accesslog(context):

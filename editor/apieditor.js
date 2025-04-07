@@ -54,6 +54,7 @@ scnjs.INTERVAL = 1500;
 scnjs.apiurl = '';
 scnjs.autoReload = false;
 scnjs.status = scnjs.ST_NONE;
+scnjs.latestLogTimestamp = -1;
 
 $onReady = function() {
   dbg.init({zoom: 1.4});
@@ -319,7 +320,8 @@ scnjs.onDataBodyChange = function() {
 
 //-----------------------------------------------------------------------------
 scnjs.getAccessLog = function() {
-  scnjs.callApi('get_accesslog', null, scnjs.getAccessLogCb);
+  var param = {latest_timestamp: scnjs.latestLogTimestamp};
+  scnjs.callApi('get_accesslog', param, scnjs.getAccessLogCb);
 };
 scnjs.getAccessLogCb = function(xhr, res, req) {
   if (xhr.status != 200) {
@@ -334,12 +336,16 @@ scnjs.getAccessLogCb = function(xhr, res, req) {
   if (res.status == 'FORBIDDEN') {
     location.href = location.href;
     return;
+  } else if (res.status == 'NOT_MODIFIED') {
+    util.IntervalProc.next('getlog');
+    return;
   } else if (res.status != 'OK') {
     scnjs.showInfotip(res.status);
     return;
   }
   var logs = res.body;
   scnjs.printAccessLog(logs);
+  util.IntervalProc.next('getlog');
 };
 scnjs.printAccessLog = function(logs) {
   var s = '';
@@ -353,6 +359,8 @@ scnjs.printAccessLog = function(logs) {
     var addr = fields[3];
     var ua = fields[4];
     var bLen = fields[5];
+
+    scnjs.latestLogTimestamp = timestamp;
 
     var dt = util.getDateTimeString(timestamp, '%YYYY-%MM-%DD %HH:%mm:%SS.%sss');
     var message = scnjs.getHttpStatusMessage(status);
@@ -369,7 +377,6 @@ scnjs.printAccessLog = function(logs) {
   s = s.replace(/(  )([2].. .+?)(  )/g, '$1<span class="status-ok">$2</span>$3');
   s = s.replace(/(  )([4-9].. .+?)(  )/g, '$1<span class="status-err">$2</span>$3');
   scnjs.writeLog(s);
-  util.IntervalProc.next('getlog');
 };
 
 scnjs.clearAccessLog = function() {
