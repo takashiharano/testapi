@@ -16,8 +16,10 @@ import websys
 DATA_DIR = util.get_relative_path(__file__, '../../../private/websys/')
 GROUPS_DATA_FILE_PATH = DATA_DIR + 'groups.json'
 
+LOGS_PATH = '../logs/'
+DETAIL_LOGS_PATH = LOGS_PATH + 'details/'
 DATA_FILE_PATH = '../_data_.txt'
-LOG_FILE_PATH = '../_access.log'
+ACCESS_LOG_FILE_PATH = LOGS_PATH + 'access.log'
 
 #------------------------------------------------------------------------------
 # Returns None if the value not found
@@ -79,7 +81,7 @@ def proc_save_data(context):
 
 #------------------------------------------------------------------------------
 def proc_get_accesslog(context):
-    data = util.read_text_file(LOG_FILE_PATH, '')
+    data = util.read_text_file(ACCESS_LOG_FILE_PATH, '')
     latest_timestamp = get_request_param_as_int('latest_timestamp', -1)
     a = util.text2list(data)
     if len(a) > 0 and latest_timestamp >= 0:
@@ -94,8 +96,20 @@ def proc_get_accesslog(context):
     websys.send_result_json('OK', body=data)
 
 def proc_clear_accesslog(context):
-    util.write_text_file(LOG_FILE_PATH, '')
+    util.write_text_file(ACCESS_LOG_FILE_PATH, '')
     websys.send_result_json('OK', body=None)
+
+#------------------------------------------------------------------------------
+def proc_get_access_detail_log(context):
+    id = get_request_param('id', '')
+
+    path = DETAIL_LOGS_PATH + id + '.txt'
+    data = util.read_text_file(path, None)
+
+    status = 'OK'
+    if data is None:
+        status = 'NOT_FOUND'
+    websys.send_result_json(status, body=data)
 
 #------------------------------------------------------------------------------
 def proc_api(context, act):

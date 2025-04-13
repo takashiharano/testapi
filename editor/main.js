@@ -55,6 +55,7 @@ main.autoReload = false;
 main.status = main.ST_NONE;
 main.latestLogTimestamp = -1;
 main.activeStatus = -1;
+main.logWindow = null;
 
 $onReady = function() {
   dbg.init({zoom: 1.4});
@@ -395,8 +396,10 @@ main.printAccessLog = function(logs) {
       statusClass = 'status-err';
     }
 
-    var txt = dt + '\t' + method + '\t' + status + ' ' + message + '\t' + addr + '\t' + ua + '\t' + bLen + ' bytes'
-    s += txt + '\n';
+    var m = '<span class="log-line" onclick="main.getAccessDetailLog(' + timestamp + ');">';
+    m += dt + '\t' + method + '\t' + status + ' ' + message + '\t' + addr + '\t' + ua + '\t' + bLen + ' bytes'
+    m += '</span>\n';
+    s += m;
   }
   s = util.alignFields(s, '\t', 2);
   s = s.replace(/(  )([2].. .+?)(  )/g, '$1<span class="status-ok">$2</span>$3');
@@ -424,6 +427,68 @@ main.clearAccessLogCb = function(xhr, res, req) {
   } else {
     main.showInfotip(res.status);
   }
+};
+
+//-----------------------------------------------------------------------------
+main.getAccessDetailLog = function(id) {
+  var param = {id: id};
+  main.callApi('get_access_detail_log', param, main.getAccessDetailLogCb);
+};
+main.getAccessDetailLogCb = function(xhr, res, req) {
+  if (xhr.status != 200) {
+    var m = 'HTTP ' + xhr.status;
+    if (xhr.status == 0) {
+      m = 'CONNECTION ERROR';
+    }
+    main.showInfotip(m);
+    main.onError();
+    return;
+  }
+  if (res.status == 'FORBIDDEN') {
+    location.href = location.href;
+    return;
+  } else if (res.status != 'OK') {
+    main.showInfotip(res.status);
+    return;
+  }
+  var logData = res.body;
+  main.showAccessDetailLog(logData);
+};
+main.showAccessDetailLog = function(logData) {
+  if (!main.logWindow) {
+    main.logWindow = main.openLogWindow();
+  }
+  $el('#detail-log').value = logData;
+};
+
+main.openLogWindow = function() {
+  html = '<div id="detail-log-wrapper">';
+  html += '<textarea id="detail-log" readonly></textarea>';
+  html += '</div>';
+  var opt = {
+    draggable: true,
+    resizable: true,
+    pos: 'c',
+    closeButton: true,
+    width: 800,
+    height: 600,
+    title: {
+      text: 'Access Log'
+    },
+    body: {
+      style: {
+        background: '#fff'
+      }
+    },
+    onclose: main.onLogWindowClose,
+    content: html
+  };
+  var win = util.newWindow(opt);
+  return win;
+};
+
+main.onLogWindowClose = function() {
+  main.logWindow = null;
 };
 
 main.startAutoReload = function() {
