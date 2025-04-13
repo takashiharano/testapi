@@ -153,7 +153,7 @@ def write_accesslog(timestamp, status, headers, body):
 
     write_access_simple_log(timestamp, info)
     write_access_detail_log(timestamp, info)
-    delete_old_detail_logs()
+    delete_old_access_detail_logs()
 
 #------------------------------------------------------------------------------
 def write_access_simple_log(timestamp, info):
@@ -221,7 +221,7 @@ def write_access_detail_log(timestamp, info):
     util.write_text_file(path, s)
 
 #------------------------------------------------------------------------------
-def delete_old_detail_logs():
+def delete_old_access_detail_logs():
     files = util.list_files(DETAIL_LOGS_PATH)
     files.sort()
     n = len(files)

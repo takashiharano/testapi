@@ -95,9 +95,19 @@ def proc_get_accesslog(context):
 
     websys.send_result_json('OK', body=data)
 
+#------------------------------------------------------------------------------
 def proc_clear_accesslog(context):
     util.write_text_file(ACCESS_LOG_FILE_PATH, '')
+    clear_access_detail_logs()
     websys.send_result_json('OK', body=None)
+
+#------------------------------------------------------------------------------
+def clear_access_detail_logs():
+    files = util.list_files(DETAIL_LOGS_PATH)
+    for i in range(len(files)):
+        del_tartget = files[i]
+        path = DETAIL_LOGS_PATH + del_tartget
+        util.delete_file(path)
 
 #------------------------------------------------------------------------------
 def proc_get_access_detail_log(context):
