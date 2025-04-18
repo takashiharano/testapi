@@ -13,11 +13,12 @@ import util
 util.append_system_path(__file__, ROOT_PATH + '/websys')
 import websys
 
-import js
-
 #------------------------------------------------------------------------------
 def build_main_screen(context):
-    html = '''<!DOCTYPE html><html><head><meta charset="utf-8">
+    html = '''<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
 <meta name="robots" content="none">
 <meta name="referrer" content="no-referrer">
 <meta name="referrer" content="never">
@@ -148,37 +149,36 @@ Status:
 </div>
 </div>
 </body>
-</html>'''
+</html>
+'''
     return html
 
 #------------------------------------------------------------------------------
 def build_forbidden_screen(context):
-    html = '''<!DOCTYPE html><html><head><meta charset="utf-8">
+    html = '''<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
 <meta name="robots" content="none">
-<meta name="referrer" content="no-referrer">
-<meta name="referrer" content="never">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-'''
-    html += '<title>Test API Editor</title>'
-    html += '<link rel="stylesheet" href="style.css" />'
-    html += '<script src="' + ROOT_PATH + 'libs/debug.js"></script>'
-    html += '<script src="' + ROOT_PATH + 'libs/util.js"></script>'
-    html += '<script src="' + ROOT_PATH + 'websys/websys.js"></script>'
-    html += '''
+<title>Test API</title>
 </head>
 <body>
 FORBIDDEN
-</body></html>'''
+</body>
+</html>
+'''
     return html
 
 #------------------------------------------------------------------------------
 def build_auth_redirection_screen():
-    html = '''<!DOCTYPE html><html><head><meta charset="utf-8">
+    html = '''<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
 <meta name="robots" content="none">
 <meta name="referrer" content="no-referrer">
 <meta name="referrer" content="never">
 '''
-    html += '<script src="' + ROOT_PATH + 'libs/debug.js"></script>'
     html += '<script src="' + ROOT_PATH + 'libs/util.js"></script>'
     html += '<script src="' + ROOT_PATH + 'websys/websys.js"></script>'
     html += '<script src="./?res=js"></script>'
@@ -188,15 +188,25 @@ $onLoad = function() {
   websys.authRedirection(location.href);
 };
 </script>
-</head><body></body></html>'''
+</head>
+<body>
+</body>
+</html>
+'''
     return html
+
+#------------------------------------------------------------------------------
+def send_js():
+    js = 'var main = main || {};'
+    js += 'websys.init(\'' + ROOT_PATH + '/\', main.onSysReady);'
+    util.send_response(js, 'text/javascript')
 
 #------------------------------------------------------------------------------
 def main():
     context = websys.on_access()
     res = util.get_request_param('res')
     if res == 'js':
-        js.main()
+        send_js()
         return
 
     if context.is_authorized():
