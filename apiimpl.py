@@ -126,26 +126,29 @@ def write_accesslog(timestamp, status, headers, body):
     info = {}
     info['timestamp'] = util.get_timestamp()
     info['method'] = os.environ.get('REQUEST_METHOD', '')
+    info['request_uri'] = os.environ.get('REQUEST_URI', '')
     info['addr'] = os.environ.get('REMOTE_ADDR', '')
     info['host']= util.get_host_name(info['addr'])
-    info['ua'] = os.environ.get('HTTP_USER_AGENT', '')
-    info['accept'] = os.environ.get('HTTP_ACCEPT', '')
-    info['accept_lang'] = os.environ.get('HTTP_ACCEPT_LANGUAGE', '')
-    info['accept_charset'] = os.environ.get('HTTP_ACCEPT_CHARSET', '')
-    info['accept_encoding'] = os.environ.get('HTTP_ACCEPT_ENCODING', '')
-    info['request_uri'] = os.environ.get('REQUEST_URI', '')
-    info['referer'] = os.environ.get('HTTP_REFERER', '')
     info['remote_port'] = os.environ.get('REMOTE_PORT', '')
     info['remote_user'] = os.environ.get('REMOTE_USER', '')
-    info['connection'] = os.environ.get('HTTP_CONNECTION', '')
-    info['proxy_connection'] = os.environ.get('HTTP_PROXY_CONNECTION', '')
-    info['via'] = os.environ.get('HTTP_VIA', '')
-    info['x_forwarded_for'] = os.environ.get('HTTP_X_FORWARDED_FOR', '')
-    info['x_forwarded_host'] = os.environ.get('HTTP_X_FORWARDED_HOST', '')
-    info['x_forwarded_proto'] = os.environ.get('HTTP_X_FORWARDED_PROTO', '')
     info['query_string'] = os.environ.get('QUERY_STRING', '')
-    info['content_type'] = os.environ.get('CONTENT_TYPE', '')
-    info['content_length'] = os.environ.get('CONTENT_LENGTH', '')
+    info['request_headers'] = get_request_headers()
+
+    #info['CONTENT_TYPE'] = os.environ.get('CONTENT_TYPE', '')
+    #info['CONTENT_LENGTH'] = os.environ.get('CONTENT_LENGTH', '')
+    #info['HTTP_USER_AGENT'] = os.environ.get('HTTP_USER_AGENT', '')
+    #info['HTTP_ACCEPT'] = os.environ.get('HTTP_ACCEPT', '')
+    #info['HTTP_ACCEPT_LANGUAGE'] = os.environ.get('HTTP_ACCEPT_LANGUAGE', '')
+    #info['HTTP_ACCEPT_CHARSET'] = os.environ.get('HTTP_ACCEPT_CHARSET', '')
+    #info['HTTP_ACCEPT_ENCODING'] = os.environ.get('HTTP_ACCEPT_ENCODING', '')
+    #info['HTTP_REFERER'] = os.environ.get('HTTP_REFERER', '')
+    #info['HTTP_CONNECTION'] = os.environ.get('HTTP_CONNECTION', '')
+    #info['HTTP_PROXY_CONNECTION'] = os.environ.get('HTTP_PROXY_CONNECTION', '')
+    #info['HTTP_VIA'] = os.environ.get('HTTP_VIA', '')
+    #info['HTTP_X_FORWARDED_FOR'] = os.environ.get('HTTP_X_FORWARDED_FOR', '')
+    #info['HTTP_X_FORWARDED_HOST'] = os.environ.get('HTTP_X_FORWARDED_HOST', '')
+    #info['HTTP_X_FORWARDED_PROTO'] = os.environ.get('HTTP_X_FORWARDED_PROTO', '')
+
     info['stdin'] = std_in
     info['status'] = status
     info['headers'] = headers
@@ -156,11 +159,26 @@ def write_accesslog(timestamp, status, headers, body):
     delete_old_access_detail_logs()
 
 #------------------------------------------------------------------------------
+def get_request_headers():
+    headers = {}
+
+    for key, value in os.environ.items():
+        if key.startswith('HTTP_'):
+            header_name = key[5:].replace('_', '-').title()
+            headers[header_name] = value
+        elif key in ('CONTENT_TYPE', 'CONTENT_LENGTH'):
+            header_name = key.replace('_', '-').title()
+            headers[header_name] = value
+
+    return headers
+
+#------------------------------------------------------------------------------
 def write_access_simple_log(timestamp, info):
     status = info['status']
     method = info['method']
     addr = info['addr']
-    ua = info['ua']
+    request_headers = info['request_headers']
+    ua = request_headers['User-Agent']
 
     body = info['body']
     response_content_len = 0
@@ -179,31 +197,27 @@ def write_access_detail_log(timestamp, info):
     dt = util.get_datetime_str(t)
     dt = dt[0:-3]
 
+    request_headers = info['request_headers']
+    name_max_len = count_key_max_len(request_headers)
+    if name_max_len < 12:
+        name_max_len = 12
+
     s = dt + '\n\n'
     s += '[Request]\n'
-    s += 'METHOD           : ' + info['method'] + '\n'
-    s += 'ADDR             : ' + info['addr'] + '\n'
-    s += 'HOST             : ' + info['host'] + '\n'
-    s += 'User-Agent       : ' + info['ua'] + '\n'
-    s += 'Accept           : ' + info['accept'] + '\n'
-    s += 'Accept-Language  : ' + info['accept_lang'] + '\n'
-    s += 'Accept-Encoding  : ' + info['accept_encoding'] + '\n'
-    s += 'Accept-Charset   : ' + info['accept_charset'] + '\n'
-    s += 'REQUEST_URI      : ' + info['request_uri'] + '\n'
-    s += 'Referer          : ' + info['referer'] + '\n'
-    s += 'Connection       : ' + info['connection'] + '\n'
-    s += 'Proxy-Connection : ' + info['proxy_connection'] + '\n'
-    s += 'Via              : ' + info['via'] + '\n'
-    s += 'X-Forwarded-For  : ' + info['x_forwarded_for'] + '\n' 
-    s += 'X-Forwarded-Host : ' + info['x_forwarded_host'] + '\n'
-    s += 'X-Forwarded-Proto: ' + info['x_forwarded_proto'] + '\n'
-    s += 'REMOTE_PORT      : ' + info['remote_port'] + '\n'
-    s += 'REMOTE_USER      : ' + info['remote_user'] + '\n'
-    s += 'QUERY_STRING     : ' + info['query_string'] + '\n'
-    s += 'Content-Type     : ' + info['content_type'] + '\n'
-    s += 'Content-Length   : ' + info['content_length'] + '\n'
-    s += 'Body             : \n' + info['stdin'] + '\n'
+    s += util.rpad('ADDR', ' ', name_max_len) + ': ' + info['addr'] + '\n'
+    s += util.rpad('HOST', ' ', name_max_len) + ': ' + info['host'] + '\n'
+    s += util.rpad('REMOTE_PORT', ' ', name_max_len) + ': ' + info['remote_port'] + '\n'
+    s += util.rpad('REMOTE_USER', ' ', name_max_len) + ': ' + info['remote_user'] + '\n'
+    s += util.rpad('METHOD', ' ', name_max_len) + ': ' + info['method'] + '\n'
+    s += util.rpad('REQUEST_URI', ' ', name_max_len) + ': ' + info['request_uri'] + '\n'
+    s += util.rpad('QUERY_STRING', ' ', name_max_len) + ': ' + info['query_string'] + '\n'
+
+    for header_name in request_headers:
+        s += util.rpad(header_name, ' ', name_max_len) + ': ' + request_headers[header_name] + '\n'
+
     s += '\n'
+    s  += info['stdin'] + '\n'
+    s += '\n\n'
 
     s += '[Response]\n';
     s += status + ' ' + st_message + '\n'
@@ -219,6 +233,15 @@ def write_access_detail_log(timestamp, info):
 
     path = DETAIL_LOGS_PATH + str(timestamp) + '.txt'
     util.write_text_file(path, s)
+
+#------------------------------------------------------------------------------
+def count_key_max_len(dict):
+    max = 0
+    for key in dict:
+        n = len(key)
+        if n > max:
+            max = n
+    return max
 
 #------------------------------------------------------------------------------
 def delete_old_access_detail_logs():
