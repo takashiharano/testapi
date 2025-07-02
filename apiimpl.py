@@ -133,22 +133,6 @@ def write_accesslog(timestamp, status, headers, body):
     info['remote_user'] = os.environ.get('REMOTE_USER', '')
     info['query_string'] = os.environ.get('QUERY_STRING', '')
     info['request_headers'] = get_request_headers()
-
-    #info['CONTENT_TYPE'] = os.environ.get('CONTENT_TYPE', '')
-    #info['CONTENT_LENGTH'] = os.environ.get('CONTENT_LENGTH', '')
-    #info['HTTP_USER_AGENT'] = os.environ.get('HTTP_USER_AGENT', '')
-    #info['HTTP_ACCEPT'] = os.environ.get('HTTP_ACCEPT', '')
-    #info['HTTP_ACCEPT_LANGUAGE'] = os.environ.get('HTTP_ACCEPT_LANGUAGE', '')
-    #info['HTTP_ACCEPT_CHARSET'] = os.environ.get('HTTP_ACCEPT_CHARSET', '')
-    #info['HTTP_ACCEPT_ENCODING'] = os.environ.get('HTTP_ACCEPT_ENCODING', '')
-    #info['HTTP_REFERER'] = os.environ.get('HTTP_REFERER', '')
-    #info['HTTP_CONNECTION'] = os.environ.get('HTTP_CONNECTION', '')
-    #info['HTTP_PROXY_CONNECTION'] = os.environ.get('HTTP_PROXY_CONNECTION', '')
-    #info['HTTP_VIA'] = os.environ.get('HTTP_VIA', '')
-    #info['HTTP_X_FORWARDED_FOR'] = os.environ.get('HTTP_X_FORWARDED_FOR', '')
-    #info['HTTP_X_FORWARDED_HOST'] = os.environ.get('HTTP_X_FORWARDED_HOST', '')
-    #info['HTTP_X_FORWARDED_PROTO'] = os.environ.get('HTTP_X_FORWARDED_PROTO', '')
-
     info['stdin'] = std_in
     info['status'] = status
     info['headers'] = headers
@@ -160,17 +144,48 @@ def write_accesslog(timestamp, status, headers, body):
 
 #------------------------------------------------------------------------------
 def get_request_headers():
-    headers = {}
+    headers = []
 
+    keys = []
     for key, value in os.environ.items():
-        if key.startswith('HTTP_'):
-            header_name = key[5:].replace('_', '-').title()
-            headers[header_name] = value
-        elif key in ('CONTENT_TYPE', 'CONTENT_LENGTH'):
-            header_name = key.replace('_', '-').title()
-            headers[header_name] = value
+        if key.startswith('HTTP_') or key in ('CONTENT_TYPE', 'CONTENT_LENGTH'):
+            name = normalize_header_name(key)
+            o = {
+                'name': name,
+                'value': value
+            }
+            headers.append(o)
+
+    headers = util.sort_object_list(headers, 'name')
 
     return headers
+
+#------------------------------------------------------------------------------
+# env_key: "HTTP_USER_AGENT" -> "User-Agent"
+def normalize_header_name(env_key):
+    raw = env_key[5:] if env_key.startswith("HTTP_") else env_key
+    parts = raw.lower().split("_")
+
+    exceptions = {
+        "etag": "ETag",
+        "te": "TE",
+        "www": "WWW",
+        "dns": "DNS",
+        "dnt": "DNT",
+        "ua": "UA",
+        "ssl": "SSL",
+        "xss": "XSS",
+        "cdn": "CDN",
+        "id": "ID",
+    }
+
+    normalized = []
+    for part in parts:
+        if part in exceptions:
+            normalized.append(exceptions[part])
+        else:
+            normalized.append(part.capitalize())
+    return "-".join(normalized)
 
 #------------------------------------------------------------------------------
 def write_access_simple_log(timestamp, info):
@@ -178,7 +193,11 @@ def write_access_simple_log(timestamp, info):
     method = info['method']
     addr = info['addr']
     request_headers = info['request_headers']
-    ua = request_headers['User-Agent']
+    uafield = util.get_dict_by_key(request_headers, 'name', 'User-Agent')
+    if uafield is None:
+        ua = ''
+    else:
+        ua = uafield['value']
 
     body = info['body']
     response_content_len = 0
@@ -203,23 +222,37 @@ def write_access_detail_log(timestamp, info):
         name_max_len = 12
 
     s = dt + '\n\n'
-    s += '[Request]\n'
-    s += util.rpad('ADDR', ' ', name_max_len) + ': ' + info['addr'] + '\n'
-    s += util.rpad('HOST', ' ', name_max_len) + ': ' + info['host'] + '\n'
-    s += util.rpad('REMOTE_PORT', ' ', name_max_len) + ': ' + info['remote_port'] + '\n'
-    s += util.rpad('REMOTE_USER', ' ', name_max_len) + ': ' + info['remote_user'] + '\n'
-    s += util.rpad('METHOD', ' ', name_max_len) + ': ' + info['method'] + '\n'
-    s += util.rpad('REQUEST_URI', ' ', name_max_len) + ': ' + info['request_uri'] + '\n'
-    s += util.rpad('QUERY_STRING', ' ', name_max_len) + ': ' + info['query_string'] + '\n'
-
-    for header_name in request_headers:
-        s += util.rpad(header_name, ' ', name_max_len) + ': ' + request_headers[header_name] + '\n'
+    s += '-------------------------------------------------------------------------------\n'
+    s += 'Request\n'
+    s += '-------------------------------------------------------------------------------\n'
+    s += util.rpad('Method', ' ', name_max_len) + ': ' + info['method'] + '\n'
+    s += util.rpad('Request URI', ' ', name_max_len) + ': ' + info['request_uri'] + '\n'
+    s += util.rpad('Query String', ' ', name_max_len) + ': ' + info['query_string'] + '\n'
 
     s += '\n'
-    s  += info['stdin'] + '\n'
-    s += '\n\n'
+    s += '[Remote Host]\n'
+    s += util.rpad('IP Address', ' ', name_max_len) + ': ' + info['addr'] + '\n'
+    s += util.rpad('Host Name', ' ', name_max_len) + ': ' + info['host'] + '\n'
+    s += util.rpad('Remote Port', ' ', name_max_len) + ': ' + info['remote_port'] + '\n'
+    s += util.rpad('Remote User', ' ', name_max_len) + ': ' + info['remote_user'] + '\n'
 
-    s += '[Response]\n';
+    s += '\n'
+    s += '[Headers]\n'
+    for i in range(len(request_headers)):
+        header = request_headers[i]
+        header_name = header['name']
+        header_value = header['value']
+        s += util.rpad(header_name, ' ', name_max_len) + ': ' + header_value + '\n'
+
+    s += '\n'
+    s += '[Body]\n'
+    s  += info['stdin'] + '\n'
+    s += '\n'
+
+    s += '-------------------------------------------------------------------------------\n'
+    s += 'Response\n';
+    s += '-------------------------------------------------------------------------------\n'
+    s += '[Headers]\n'
     s += status + ' ' + st_message + '\n'
 
     headers = info['headers']
@@ -229,19 +262,11 @@ def write_access_detail_log(timestamp, info):
             s += name + ': ' + header[name] + '\n'
 
     s += '\n'
+    s += '[Body]\n'
     s += info['body']
 
     path = DETAIL_LOGS_PATH + str(timestamp) + '.txt'
     util.write_text_file(path, s)
-
-#------------------------------------------------------------------------------
-def count_key_max_len(dict):
-    max = 0
-    for key in dict:
-        n = len(key)
-        if n > max:
-            max = n
-    return max
 
 #------------------------------------------------------------------------------
 def delete_old_access_detail_logs():
@@ -258,6 +283,17 @@ def delete_old_access_detail_logs():
         del_tartget = del_files[i]
         path = DETAIL_LOGS_PATH + del_tartget
         util.delete_file(path)
+
+#------------------------------------------------------------------------------
+def count_key_max_len(dict):
+    max = 0
+    for i in range(len(dict)):
+        item = dict[i]
+        name = item['name']
+        n = len(name)
+        if n > max:
+            max = n
+    return max
 
 #----------------------------------------------------------
 def main():
