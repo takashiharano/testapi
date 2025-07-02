@@ -225,3 +225,8 @@ button:hover, input[type="button"]:hover, input[type="submit"]:hover {
   height: 100%;
   resize: none;
 }
+
+.no-line-break {
+  white-space: pre;
+  word-break: keep-all;
+}

@@ -463,7 +463,7 @@ main.showAccessDetailLog = function(logData) {
 
 main.openLogWindow = function() {
   html = '<div id="detail-log-wrapper">';
-  html += '<textarea id="detail-log" readonly></textarea>';
+  html += '<textarea id="detail-log" class="no-line-break" readonly></textarea>';
   html += '</div>';
   var opt = {
     draggable: true,
