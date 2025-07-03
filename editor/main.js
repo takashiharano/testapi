@@ -470,7 +470,7 @@ main.openLogWindow = function() {
     resizable: true,
     pos: 'c',
     closeButton: true,
-    width: 800,
+    width: 900,
     height: 600,
     title: {
       text: 'Access Log'
