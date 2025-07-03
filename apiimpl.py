@@ -161,22 +161,28 @@ def get_request_headers():
     return headers
 
 #------------------------------------------------------------------------------
-# env_key: "HTTP_USER_AGENT" -> "User-Agent"
+# env_key: 'HTTP_USER_AGENT' -> 'User-Agent'
 def normalize_header_name(env_key):
-    raw = env_key[5:] if env_key.startswith("HTTP_") else env_key
-    parts = raw.lower().split("_")
+    raw = env_key[5:] if env_key.startswith('HTTP_') else env_key
+    parts = raw.lower().split('_')
 
     exceptions = {
-        "etag": "ETag",
-        "te": "TE",
-        "www": "WWW",
-        "dns": "DNS",
-        "dnt": "DNT",
-        "ua": "UA",
-        "ssl": "SSL",
-        "xss": "XSS",
-        "cdn": "CDN",
-        "id": "ID",
+        'cdn': 'CDN',
+        'ch': 'CH',
+        'dns': 'DNS',
+        'dnt': 'DNT',
+        'etag': 'ETag',
+        'fpm': 'FPM',
+        'gpc': 'GPC',
+        'id': 'ID',
+        'ip': 'IP',
+        'php': 'PHP',
+        'ssl': 'SSL',
+        'te': 'TE',
+        'ua': 'UA',
+        'wow64': 'WoW64',
+        'www': 'WWW',
+        'xss': 'XSS'
     }
 
     normalized = []
@@ -185,7 +191,7 @@ def normalize_header_name(env_key):
             normalized.append(exceptions[part])
         else:
             normalized.append(part.capitalize())
-    return "-".join(normalized)
+    return '-'.join(normalized)
 
 #------------------------------------------------------------------------------
 def write_access_simple_log(timestamp, info):
