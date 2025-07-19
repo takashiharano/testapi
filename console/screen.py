@@ -1,6 +1,6 @@
 #==============================================================================
-# API EMULATOR - RESPONSE EDITOR SCREEN
-# Copyright 2025 Takashi Harano
+# API EMULATOR - Console Screen
+# Copyright (c) 2025 Takashi Harano
 #==============================================================================
 import os
 import sys
@@ -38,7 +38,7 @@ def build_main_screen(context):
 <div id="header-line">
 <div id="header-content">
 <span id="title" style="margin-left:8px;"><span id="api">API</span> Emulator - Response Editor</span>
-<span id="url-info" style="margin-left:16px;">API URL <span id="url"></span></span>
+<span id="url-info" style="margin-left:16px;">API URL <span id="url"></span><span id="copy-url"></span></span>
 <span id="clock"></span>
 </div>
 </div>

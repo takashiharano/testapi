@@ -1,6 +1,6 @@
 #==============================================================================
-# API EMULATOR - RESPONSE EDITOR
-# Copyright 2025 Takashi Harano
+# API EMULATOR - Console API
+# Copyright (c) 2025 Takashi Harano
 #==============================================================================
 import os
 import sys

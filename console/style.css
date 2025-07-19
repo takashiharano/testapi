@@ -131,6 +131,13 @@ button:hover, input[type="button"]:hover, input[type="submit"]:hover {
   font-family: Consolas, Monaco, Menlo, monospace, sans-serif;
 }
 
+#copy-url {
+  margin-left: 4px;
+  color: #eee;
+  font-size: 12px;
+  font-family: Consolas, Monaco, Menlo, monospace, sans-serif;
+}
+
 #clock {
   position: absolute;
   right: 10px;

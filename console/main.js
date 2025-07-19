@@ -1,5 +1,5 @@
 /*!
- * Copyright 2025 Takashi Harano
+ * Copyright (c) 2025 Takashi Harano
  */
 var main = {};
 
@@ -61,10 +61,11 @@ $onReady = function() {
   dbg.init({zoom: 1.4});
   util.clock('#clock', '%YYYY-%MM-%DD %W %HH:%mm:%SS %Z');
 
-  var url = location.href.replace(/editor\/$/, '');
+  var url = location.href.replace(/console\/$/, '');
   main.apiurl = url;
-  var urlLabel = main.buildCopyableLabel(url);
-  $el('#url').innerHTML = urlLabel;
+  var copyLabel = main.buildCopyableLabel(url, '[Copy]');
+  $el('#url').innerHTML = url;
+  $el('#copy-url').innerHTML = copyLabel;
 
   main.led1 = new util.Led('#led1');
   main.console1 = util.initConsole('#log-console');
