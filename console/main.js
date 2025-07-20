@@ -346,11 +346,11 @@ main.onDataBodyChange = function() {
 };
 
 //-----------------------------------------------------------------------------
-main.getAccessLog = function() {
+main.getLogs = function() {
   var param = {latest_timestamp: main.latestLogTimestamp};
-  main.callApi('get_accesslog', param, main.getAccessLogCb);
+  main.callApi('get_logs', param, main.getLogsCb);
 };
-main.getAccessLogCb = function(xhr, res, req) {
+main.getLogsCb = function(xhr, res, req) {
   if (xhr.status != 200) {
     var m = 'HTTP ' + xhr.status;
     if (xhr.status == 0) {
@@ -371,10 +371,10 @@ main.getAccessLogCb = function(xhr, res, req) {
     return;
   }
   var logs = res.body;
-  main.printAccessLog(logs);
+  main.printLogs(logs);
   util.IntervalProc.next('getlog');
 };
-main.printAccessLog = function(logs) {
+main.printLogs = function(logs) {
   var s = '';
   var a = util.text2list(logs);
   for (var i = 0; i < a.length; i++) {
@@ -397,7 +397,8 @@ main.printAccessLog = function(logs) {
       statusClass = 'status-err';
     }
 
-    var m = '<span class="log-line" onclick="main.getAccessDetailLog(' + timestamp + ');">';
+    var isSysLog = (method.match(/#.+#/) ? 1 : 0);
+    var m = '<span class="log-line" onclick="main.getDetaiedlLog(' + timestamp + ', ' + isSysLog + ');">';
     m += dt + '\t' + method + '\t' + status + ' ' + message + '\t' + addr + '\t' + ua + '\t' + bLen + ' bytes'
     m += '</span>\n';
     s += m;
@@ -408,10 +409,13 @@ main.printAccessLog = function(logs) {
   main.writeLog(s);
 };
 
-main.clearAccessLog = function() {
-  main.callApi('clear_accesslog', null, main.clearAccessLogCb);
+main.clearLogs = function() {
+  util.confirm('Clear logs?', main._clearLogs);
 };
-main.clearAccessLogCb = function(xhr, res, req) {
+main._clearLogs = function() {
+  main.callApi('clear_logs', null, main.clearLogsCb);
+};
+main.clearLogsCb = function(xhr, res, req) {
   if (xhr.status != 200) {
     var m = 'HTTP ' + xhr.status;
     if (xhr.status == 0) {
@@ -431,11 +435,13 @@ main.clearAccessLogCb = function(xhr, res, req) {
 };
 
 //-----------------------------------------------------------------------------
-main.getAccessDetailLog = function(id) {
-  var param = {id: id};
-  main.callApi('get_access_detail_log', param, main.getAccessDetailLogCb);
+main.getDetaiedlLog = function(id, isSysLog) {
+  if (!isSysLog) {
+    var param = {id: id};
+    main.callApi('get_detailed_log', param, main.getDetaiedlLogCb);
+  }
 };
-main.getAccessDetailLogCb = function(xhr, res, req) {
+main.getDetaiedlLogCb = function(xhr, res, req) {
   if (xhr.status != 200) {
     var m = 'HTTP ' + xhr.status;
     if (xhr.status == 0) {
@@ -506,7 +512,7 @@ main.stopAutoReload = function() {
 
 main.procInterval = function() {
   if (main.autoReload) {
-    main.getAccessLog();
+    main.getLogs();
   }
 };
 
@@ -569,5 +575,11 @@ $onCtrlS = function(e) {
 $onEnterKey = function(e) {
   if ($el('#status-code').hasFocus()) {
     main.onStatusSet();
+  }
+};
+
+$onEscKey = function(e) {
+  if (main.logWindow) {
+    main.logWindow.close();
   }
 };

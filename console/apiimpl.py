@@ -6,6 +6,7 @@ import os
 import sys
 
 ROOT_PATH = '../../'
+BASE_PATH = '../'
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ROOT_PATH + 'libs'))
 import util
@@ -13,13 +14,11 @@ import util
 util.append_system_path(__file__, ROOT_PATH + 'websys')
 import websys
 
-DATA_DIR = util.get_relative_path(__file__, '../../../private/websys/')
-GROUPS_DATA_FILE_PATH = DATA_DIR + 'groups.json'
+sys.path.append(os.path.join(os.path.dirname(__file__), BASE_PATH))
+import appcommon
+import applogger
 
-LOGS_PATH = '../logs/'
-DETAIL_LOGS_PATH = LOGS_PATH + 'details/'
-DATA_FILE_PATH = '../_data_.txt'
-ACCESS_LOG_FILE_PATH = LOGS_PATH + 'access.log'
+DATA_FILE_PATH = BASE_PATH + '_data_.txt'
 
 #------------------------------------------------------------------------------
 # Returns None if the value not found
@@ -77,12 +76,32 @@ def proc_save_data(context):
     except Exception as e:
         status = 'ERROR'
         body = str(e)
+
+    write_log(data)
     websys.send_result_json(status, body=body)
 
 #------------------------------------------------------------------------------
-def proc_get_accesslog(context):
-    data = util.read_text_file(ACCESS_LOG_FILE_PATH, '')
+def write_log(data):
+    timestamp = util.get_unixtime_millis()
+
+    o = appcommon.parse_data(data)
+    status = o['status']
+
+    headers = [{'name': 'User-Agent', 'value': 'Test API Console'}]
+
+    info = {}
+    info['method'] = '#SET#'
+    info['addr'] = os.environ.get('REMOTE_ADDR', '')
+    info['status'] = status
+    info['request_headers'] = headers
+    info['body'] = data
+
+    applogger.write_log(timestamp, info)
+
+#------------------------------------------------------------------------------
+def proc_get_logs(context):
     latest_timestamp = get_request_param_as_int('latest_timestamp', -1)
+    data = applogger.get_log()
     a = util.text2list(data)
     if len(a) > 0 and latest_timestamp >= 0:
         latest_line = a[-1]
@@ -96,25 +115,15 @@ def proc_get_accesslog(context):
     websys.send_result_json('OK', body=data)
 
 #------------------------------------------------------------------------------
-def proc_clear_accesslog(context):
-    util.write_text_file(ACCESS_LOG_FILE_PATH, '')
-    clear_access_detail_logs()
+def proc_clear_logs(context):
+    applogger.clear_log()
+    applogger.clear_detailed_logs()
     websys.send_result_json('OK', body=None)
 
 #------------------------------------------------------------------------------
-def clear_access_detail_logs():
-    files = util.list_files(DETAIL_LOGS_PATH)
-    for i in range(len(files)):
-        del_tartget = files[i]
-        path = DETAIL_LOGS_PATH + del_tartget
-        util.delete_file(path)
-
-#------------------------------------------------------------------------------
-def proc_get_access_detail_log(context):
+def proc_get_detailed_log(context):
     id = get_request_param('id', '')
-
-    path = DETAIL_LOGS_PATH + id + '.txt'
-    data = util.read_text_file(path, None)
+    data = applogger.get_detailed_log(id)
 
     status = 'OK'
     if data is None:

@@ -1,8 +1,8 @@
-#===============================
+#==================================
 # Test API
-# Copyright 2025 Takashi Harano
+# Copyright (c) 2025 Takashi Harano
 # Released under the MIT license
-#===============================
+#==================================
 import os
 import sys
 
@@ -10,17 +10,16 @@ ROOT_DIR = '../'
 sys.path.append(os.path.join(os.path.dirname(__file__), ROOT_DIR + 'libs'))
 import util
 
+import appcommon
+import applogger
+
 util.append_system_path(__file__, './postalcode')
 try:
     import postalcode
 except:
     pass
 
-LOGS_PATH = './logs/'
-DETAIL_LOGS_PATH = LOGS_PATH + 'details/'
 DATA_FILE_PATH = './_data_.txt'
-ACCESS_LOG_FILE_PATH = LOGS_PATH + 'access.log'
-LOG_MAX = 20
 
 #------------------------------------------------------------------------------
 def api_hello():
@@ -84,38 +83,17 @@ def api_postalcode():
 #------------------------------------------------------------------------------
 def send_response_from_data():
     now = util.get_unixtime_millis()
-    header = ''
-    body = ''
 
     data = util.read_text_file(DATA_FILE_PATH, '')
-    pos = data.find("\n\n")
-
-    if pos >= 0:
-        header = data[:pos] + '\n'
-        body = data[pos + 2:]
-    else:
-        header = data
-
-    header_lines = util.text2list(header)
-    status_line = header_lines[0]
-
-    status_code = util.extract_string(status_line, r'.+([0-9]{3}).+')
-    try:
-        status = int(status_code)
-    except:
-        status = 200
-
-    headers = []
-    for i in range(1, len(header_lines)):
-        header_field = header_lines[i]
-        fields = header_field.split(': ')
-        name = fields[0]
-        value = fields[1]
-        headers.append({name: value})
+    o = appcommon.parse_data(data)
+    status = o['status']
+    headers = o['headers']
+    body = o['body']
 
     write_accesslog(now, status, headers, body)
     util.send_response(body, status=status, headers=headers)
 
+#------------------------------------------------------------------------------
 def write_accesslog(timestamp, status, headers, body):
     std_in = util.read_stdin()
     try:
@@ -138,9 +116,9 @@ def write_accesslog(timestamp, status, headers, body):
     info['headers'] = headers
     info['body'] = body
 
-    write_access_simple_log(timestamp, info)
-    write_access_detail_log(timestamp, info)
-    delete_old_access_detail_logs()
+    applogger.write_log(timestamp, info)
+    applogger.write_detailed_log(timestamp, info)
+    applogger.delete_old_detailed_logs()
 
 #------------------------------------------------------------------------------
 def get_request_headers():
@@ -192,114 +170,6 @@ def normalize_header_name(env_key):
         else:
             normalized.append(part.capitalize())
     return '-'.join(normalized)
-
-#------------------------------------------------------------------------------
-def write_access_simple_log(timestamp, info):
-    status = info['status']
-    method = info['method']
-    addr = info['addr']
-    request_headers = info['request_headers']
-    uafield = util.get_dict_by_key(request_headers, 'name', 'User-Agent')
-    if uafield is None:
-        ua = ''
-    else:
-        ua = uafield['value']
-
-    body = info['body']
-    response_content_len = 0
-    if body is not None:
-        response_content_len = len(body)
-
-    log_text = str(timestamp) + '\t' + method + '\t' + str(status) + '\t' + addr + '\t' + ua + '\t' + str(response_content_len)
-    util.append_line_to_text_file(ACCESS_LOG_FILE_PATH, log_text, max=LOG_MAX)
-
-#------------------------------------------------------------------------------
-def write_access_detail_log(timestamp, info):
-    status = str(info['status'])
-    st_message = util.get_status_message(status)
-
-    t = util.milli_to_micro(timestamp)
-    dt = util.get_datetime_str(t)
-    dt = dt[0:-3]
-
-    request_headers = info['request_headers']
-    name_max_len = count_key_max_len(request_headers)
-    if name_max_len < 12:
-        name_max_len = 12
-
-    s = dt + '\n\n'
-    s += '-------------------------------------------------------------------------------\n'
-    s += 'Request\n'
-    s += '-------------------------------------------------------------------------------\n'
-    s += util.rpad('Method', ' ', name_max_len) + ': ' + info['method'] + '\n'
-    s += util.rpad('Request URI', ' ', name_max_len) + ': ' + info['request_uri'] + '\n'
-    s += util.rpad('Query String', ' ', name_max_len) + ': ' + info['query_string'] + '\n'
-
-    s += '\n'
-    s += '[Remote Host]\n'
-    s += util.rpad('IP Address', ' ', name_max_len) + ': ' + info['addr'] + '\n'
-    s += util.rpad('Host Name', ' ', name_max_len) + ': ' + info['host'] + '\n'
-    s += util.rpad('Remote Port', ' ', name_max_len) + ': ' + info['remote_port'] + '\n'
-    s += util.rpad('Remote User', ' ', name_max_len) + ': ' + info['remote_user'] + '\n'
-
-    s += '\n'
-    s += '[Headers]\n'
-    for i in range(len(request_headers)):
-        header = request_headers[i]
-        header_name = header['name']
-        header_value = header['value']
-        s += util.rpad(header_name, ' ', name_max_len) + ': ' + header_value + '\n'
-
-    s += '\n'
-    s += '[Body]\n'
-    s  += info['stdin'] + '\n'
-    s += '\n'
-
-    s += '-------------------------------------------------------------------------------\n'
-    s += 'Response\n';
-    s += '-------------------------------------------------------------------------------\n'
-    s += '[Headers]\n'
-    s += status + ' ' + st_message + '\n'
-
-    headers = info['headers']
-    for i in range(len(headers)):
-        header = headers[i]
-        for name in header:
-            s += name + ': ' + header[name] + '\n'
-
-    s += '\n'
-    s += '[Body]\n'
-    s += info['body']
-
-    path = DETAIL_LOGS_PATH + str(timestamp) + '.txt'
-    util.write_text_file(path, s)
-
-#------------------------------------------------------------------------------
-def delete_old_access_detail_logs():
-    files = util.list_files(DETAIL_LOGS_PATH)
-    files.sort()
-    n = len(files)
-
-    del_num = n - LOG_MAX
-    if del_num <= 0:
-        return
-
-    del_files = files[0: del_num]
-    for i in range(del_num):
-        del_tartget = del_files[i]
-        path = DETAIL_LOGS_PATH + del_tartget
-        util.delete_file(path)
-
-#------------------------------------------------------------------------------
-def count_key_max_len(dict):
-    max = 0
-    for i in range(len(dict)):
-        item = dict[i]
-        name = item['name']
-        n = len(name)
-        if n > max:
-            max = n
-    return max
 
 #----------------------------------------------------------
 def main():

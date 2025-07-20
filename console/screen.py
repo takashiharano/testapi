@@ -24,7 +24,7 @@ def build_main_screen(context):
 <meta name="referrer" content="never">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 '''
-    html += '<title>Test API Editor</title>'
+    html += '<title>Test API Console</title>'
     html += '<link rel="stylesheet" href="style.css" />'
     html += '<script src="' + ROOT_PATH + 'libs/sha.js"></script>'
     html += '<script src="' + ROOT_PATH + 'libs/debug.js"></script>'
@@ -45,8 +45,8 @@ def build_main_screen(context):
 
 <div id="content-wrapper">
 <div>
-<span id="led1" style="margin-right:4px;"></span><span class="item-name">Access Log</span>
-<button class="button-small" onclick="main.clearAccessLog();">Clear</button>
+<span id="led1" style="margin-right:4px;"></span><span class="item-name">Logs</span>
+<button class="button-small" onclick="main.clearLogs();">Clear</button>
 <div id="console-area"><pre id="log-console"></pre></div>
 </div>
 
