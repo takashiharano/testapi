@@ -205,13 +205,21 @@ main.buildBodyTemplate200 = function() {
   return '{"message":"Hello, World!"}';
 };
 
+main.onAutoApplyChange = function(el) {
+  if (!el.checked) {
+    main.activeButton(-1);
+  }
+};
+
 main.onSetStatusButton = function(status) {
   main.setResponseTemplate(status);
-  $el('#status').value = '';
-  $el('#status-code').value = '';
-  main.saveData();
-  main.activeStatus = status;
-  main.activeButton(status);
+  if ($el('#auto-apply').checked) {
+    $el('#status').value = '';
+    $el('#status-code').value = '';
+    main.saveData();
+    main.activeStatus = status;
+    main.activeButton(status);
+  }
 };
 
 main.getHttpStatusMessage = function(status) {

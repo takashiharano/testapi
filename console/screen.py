@@ -55,8 +55,13 @@ def build_main_screen(context):
 <button class="button-large button-blue" onclick="main.save();">Save</button>
 </span>
 
-<span style="margin-left:16px;">
-Status:
+<span style="margin-left:8px;">
+<label class="switch">
+  <input type="checkbox" id="auto-apply" onchange="main.onAutoApplyChange(this);">
+  <span class="slider round"></span>
+</label><span style="margin-left:6px;">Auto</span>
+
+<span style="margin-left:6px;">Status:</span>
 <span>
 <button id="button-200" class="status-button" onclick="main.onSetStatusButton(200);" data-tooltip2="200 OK">200</button>
 <button id="button-301" class="status-button" onclick="main.onSetStatusButton(301);" data-tooltip2="301 Moved Permanently">301</button>
