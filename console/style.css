@@ -14,7 +14,7 @@ input[type="text"], input[type="password"] {
   border-bottom: solid 1px #ccc;
   background: transparent;
   color: #1b1b1b;
-  font-size: 16px;
+  font-size: 14px;
   outline: none;
 }
 
@@ -35,7 +35,7 @@ textarea {
   background: transparent;
   padding: 4px;
   color: #1b1b1b;
-  font-size: 16px;
+  font-size: 14px;
   font-family: Consolas, Monaco, Menlo, monospace, sans-serif;
 }
 
