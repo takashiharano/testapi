@@ -1,5 +1,5 @@
 /*!
- * Copyright (c) 2025 Takashi Harano
+ * Copyright 2025 Takashi Harano
  */
 var main = {};
 

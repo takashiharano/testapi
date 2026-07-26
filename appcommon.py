@@ -1,6 +1,6 @@
 #==================================
 # Test API Common Module
-# Copyright (c) 2025 Takashi Harano
+# Copyright 2025 Takashi Harano
 # Released under the MIT license
 #==================================
 import os
