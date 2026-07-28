@@ -38,7 +38,7 @@ def api_host():
         host = socket.gethostbyaddr(addr)[0]
     except Exception as e:
         host = '(no host name)'
-    
+
     print('Content-Type: text/plain');
     print();
     print(host, end='')
