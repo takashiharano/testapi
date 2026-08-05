@@ -1,7 +1,7 @@
 #==================================
 # Test API
 # Copyright 2025 Takashi Harano
-# Released under the MIT license
+# Released under the MIT License
 #==================================
 import os
 import sys
