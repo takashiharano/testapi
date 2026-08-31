@@ -1,8 +1,8 @@
-#==================================
+#==============================================================================
 # Test API
 # Copyright 2025 Takashi Harano
 # Released under the MIT License
-#==================================
+#==============================================================================
 import os
 import sys
 
@@ -23,13 +23,13 @@ DATA_FILE_PATH = './_data_.txt'
 
 #------------------------------------------------------------------------------
 def api_hello():
-    name = util.get_request_param('name', '');
+    name = util.get_request_param('name', '')
     text = 'Hello'
     if name != '':
         text += ', ' + name
     text += '!'
     json = '{"message": "' + text + '"}'
-    util.send_response(json, 'application/json');
+    util.send_response(json, 'application/json')
 
 #------------------------------------------------------------------------------
 def api_host():
@@ -39,8 +39,8 @@ def api_host():
     except Exception as e:
         host = '(no host name)'
 
-    print('Content-Type: text/plain');
-    print();
+    print('Content-Type: text/plain')
+    print()
     print(host, end='')
 
 #------------------------------------------------------------------------------
@@ -52,7 +52,7 @@ def api_ip():
 
 #------------------------------------------------------------------------------
 def api_status():
-    p_code = util.get_request_param('code', '');
+    p_code = util.get_request_param('code', '')
     try:
         code = int(p_code)
     except:
@@ -78,7 +78,7 @@ def api_postalcode():
     if 'postalcode' in sys.modules:
         postalcode.webmain()
     else:
-        util.send_response('postalcode module is required.');
+        util.send_response('postalcode module is required.')
 
 #------------------------------------------------------------------------------
 def send_response_from_data():
@@ -173,7 +173,7 @@ def normalize_header_name(env_key):
 
 #----------------------------------------------------------
 def main():
-    api = util.get_request_param('api', '');
+    api = util.get_query_param('api', '')
 
     func_name = 'api_' + api
     g = globals()
