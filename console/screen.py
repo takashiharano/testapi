@@ -203,7 +203,7 @@ $onLoad = function() {
 #------------------------------------------------------------------------------
 def send_js():
     js = 'var main = main || {};'
-    js += 'websys.init(\'' + ROOT_PATH + '/\', main.onSysReady);'
+    js += 'websys.init(\'testapi\', \'' + ROOT_PATH + '/\', main.onSysReady);'
     util.send_response(js, 'text/javascript')
 
 #------------------------------------------------------------------------------
