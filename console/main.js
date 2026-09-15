@@ -63,7 +63,7 @@ $onReady = function() {
 
   var url = location.href.replace(/console\/$/, '');
   main.apiurl = url;
-  var copyLabel = main.buildCopyableLabel(url, '[Copy]');
+  var copyLabel = main.buildCopyableLabel(url, '&#x29C9;');
   $el('#url').innerHTML = url;
   $el('#copy-url').innerHTML = copyLabel;
 
