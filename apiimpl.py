@@ -28,8 +28,9 @@ def api_hello():
     if name != '':
         text += ', ' + name
     text += '!'
-    json = '{"message": "' + text + '"}'
-    util.send_response(json, 'application/json')
+
+    data = util.to_json({'message': text})
+    util.send_response(data, 'application/json')
 
 #------------------------------------------------------------------------------
 def api_host():
