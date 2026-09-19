@@ -1,5 +1,5 @@
 #==============================================================================
-# API EMULATOR - Console API
+# TestAPI - API Emulator Console API
 # Copyright 2025 Takashi Harano
 #==============================================================================
 import os
@@ -91,7 +91,7 @@ def write_log(data):
     o = appcommon.parse_data(data)
     status = o['status']
 
-    headers = [{'name': 'User-Agent', 'value': 'Test API Console'}]
+    headers = [{'name': 'User-Agent', 'value': 'TestAPI-Console/1.0'}]
 
     info = {}
     info['method'] = '#SET#'

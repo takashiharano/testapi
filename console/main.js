@@ -1,4 +1,5 @@
 /*!
+ * TestAPI - API Emulator Console
  * Copyright 2025 Takashi Harano
  */
 var main = {};
@@ -637,5 +638,5 @@ $onEscKey = function(e) {
 };
 
 main.openAboutDialog = function() {
-  util.alert('Test API\n\n&copy; 2025 Takashi Harano\nMIT LIcense\n\n<a href="https://github.com/takashiharano/testapi" target="_blank">GitHub</a>');
+  util.alert('TestAPI\n\n&copy; 2025 Takashi Harano\nMIT License\n\n<a href="https://github.com/takashiharano/testapi" target="_blank">GitHub</a>');
 };
