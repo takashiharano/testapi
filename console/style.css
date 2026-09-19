@@ -9,6 +9,14 @@ html, body {
   font-family: Consolas, Monaco, Menlo, monospace, sans-serif;
 }
 
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
 input[type="text"], input[type="password"] {
   border: none;
   border-bottom: solid 1px #185878;
@@ -295,4 +303,25 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
+}
+
+.dialog {
+  background: #08141d !important;
+  color: #c9e6f2 !important;
+  border: solid 1px #12658a;
+  border-radius: 2px;
+  box-shadow: 0 0 12px rgb(0 170 255 / .18);
+  font-family: Consolas, Monaco, Menlo, monospace, sans-serif;
+}
+
+.dialog a {
+  color: #3dc5ff;
+}
+
+.dialog a:hover {
+  color: #9edfff;
+}
+
+.dialog-overlay {
+  background: rgb(0 0 0 / .55);
 }
