@@ -47,7 +47,7 @@ def build_main_screen():
 <div id="body1">
 <div id="header-line">
 <div id="header-content">
-<span id="title" style="margin-left:8px;"><span class="pseudo-link" onclick="main.openAboutDialog();"><span id="api">API</span> Emulator</span> - HTTP/1.1 Response Editor</span>
+<span id="title" style="margin-left:8px;"><span class="pseudo-link" onclick="main.openAboutDialog();">API Emulator</span> - HTTP/1.1 Response Editor</span>
 <span id="url-info" style="margin-left:16px;">API URL <span id="url"></span><span id="copy-url"></span></span>
 <span id="clock"></span>
 </div>
