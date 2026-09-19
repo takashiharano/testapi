@@ -12,9 +12,13 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ROOT_PATH + 'libs'))
 import util
 
 util.append_system_path(__file__, ROOT_PATH + 'websys')
-import websys
+try:
+    import websys
+except:
+    pass
 
-sys.path.append(os.path.join(os.path.dirname(__file__), BASE_PATH))
+util.append_system_path(__file__, BASE_PATH)
+import appconfig
 import appcommon
 import applogger
 
@@ -23,13 +27,13 @@ DATA_FILE_PATH = BASE_PATH + '_data_.txt'
 #------------------------------------------------------------------------------
 # Returns None if the value not found
 def get_request_param(key, default=None):
-    return websys.get_request_param(key, default=default)
+    return util.get_request_param(key, default=default)
 
 def get_request_param_as_int(key, default=0):
-    return websys.get_request_param_as_int(key, default)
+    return util.get_request_param_as_int(key, default)
 
 def send_result_json(status, body=None):
-    websys.send_result_json(status, body)
+    util.send_result_json(status, body)
 
 def send_error_text(msg):
     b = msg.encode()
@@ -57,7 +61,7 @@ def proc_get_data(context):
         'body': body
     }
 
-    websys.send_result_json('OK', body=o)
+    util.send_result_json('OK', body=o)
 
 #------------------------------------------------------------------------------
 def proc_save_data(context):
@@ -78,7 +82,7 @@ def proc_save_data(context):
         body = str(e)
 
     write_log(data)
-    websys.send_result_json(status, body=body)
+    util.send_result_json(status, body=body)
 
 #------------------------------------------------------------------------------
 def write_log(data):
@@ -109,16 +113,16 @@ def proc_get_logs(context):
             log_fields = latest_line.split('\t')
             timestamp = int(log_fields[0])
             if timestamp == latest_timestamp:
-                websys.send_result_json('NOT_MODIFIED', body=None)
+                util.send_result_json('NOT_MODIFIED', body=None)
                 return
 
-    websys.send_result_json('OK', body=data)
+    util.send_result_json('OK', body=data)
 
 #------------------------------------------------------------------------------
 def proc_clear_logs(context):
     applogger.clear_log()
     applogger.clear_detailed_logs()
-    websys.send_result_json('OK', body=None)
+    util.send_result_json('OK', body=None)
 
 #------------------------------------------------------------------------------
 def proc_get_detailed_log(context):
@@ -128,7 +132,7 @@ def proc_get_detailed_log(context):
     status = 'OK'
     if data is None:
         status = 'NOT_FOUND'
-    websys.send_result_json(status, body=data)
+    util.send_result_json(status, body=data)
 
 #------------------------------------------------------------------------------
 def proc_api(context, act):
@@ -139,16 +143,26 @@ def proc_api(context, act):
     if func_name in g:
         g[func_name](context)
     else:
-        websys.send_result_json('PROC_NOT_FOUND:' + act, None)
+        util.send_result_json('PROC_NOT_FOUND:' + act, None)
 
 #------------------------------------------------------------------------------
 def main():
-    context = websys.on_access()
+    context = None
+    if 'websys' in sys.modules:
+        context = websys.on_access()
+
     act = get_request_param('act')
 
-    if context.is_authorized():
-        if context.has_permission('testapi'):
-            proc_api(context, act)
-            return
-
-    proc_on_forbidden()
+    if appconfig.console_auth_required:
+        if 'websys' in sys.modules:
+            if context.is_authorized():
+                if context.has_permission('testapi'):
+                    proc_api(context, act)
+                else:
+                    proc_on_forbidden()
+            else:
+                proc_on_forbidden()
+        else:
+            util.send_result_json('MODULE_LOAD_ERROR', body=None)
+    else:
+        proc_api(context, act)

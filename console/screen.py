@@ -6,15 +6,22 @@ import os
 import sys
 
 ROOT_PATH = '../../'
+BASE_PATH = '../'
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ROOT_PATH + 'libs'))
 import util
 
 util.append_system_path(__file__, ROOT_PATH + '/websys')
-import websys
+try:
+    import websys
+except:
+    pass
+
+util.append_system_path(__file__, BASE_PATH)
+import appconfig
 
 #------------------------------------------------------------------------------
-def build_main_screen(context):
+def build_main_screen():
     html = '''<!DOCTYPE html>
 <html>
 <head>
@@ -29,9 +36,12 @@ def build_main_screen(context):
     html += '<script src="' + ROOT_PATH + 'libs/sha.js"></script>'
     html += '<script src="' + ROOT_PATH + 'libs/debug.js"></script>'
     html += '<script src="' + ROOT_PATH + 'libs/util.js"></script>'
-    html += '<script src="' + ROOT_PATH + 'websys/websys.js"></script>'
-    html += '<script src="main.js"></script>'
-    html += '''<script src="./?res=js"></script>
+
+    if 'websys' in sys.modules:
+        html += '<script src="' + ROOT_PATH + 'websys/websys.js"></script>'
+        html += '<script src="./?res=js"></script>'
+
+    html += '''<script src="main.js"></script>'
 </head>
 <body>
 <div id="body1">
@@ -181,7 +191,7 @@ def build_main_screen(context):
     return html
 
 #------------------------------------------------------------------------------
-def build_forbidden_screen(context):
+def build_forbidden_screen():
     html = '''<!DOCTYPE html>
 <html>
 <head>
@@ -230,19 +240,26 @@ def send_js():
 
 #------------------------------------------------------------------------------
 def main():
-    context = websys.on_access()
+    if 'websys' in sys.modules:
+        context = websys.on_access()
+
     res = util.get_request_param('res')
     if res == 'js':
         send_js()
         return
 
-    if context.is_authorized():
-        if context.has_permission('testapi'):
-            html = build_main_screen(context)
+    if appconfig.console_auth_required:
+        if 'websys' in sys.modules:
+            if context.is_authorized():
+                if context.has_permission(appconfig.console_app_permission_name):
+                    html = build_main_screen()
+                else:
+                    html = build_forbidden_screen()
+            else:
+                html = build_auth_redirection_screen()
         else:
-            html = build_forbidden_screen(context)
-
+            html = 'error: websys module is required';
     else:
-        html = build_auth_redirection_screen()
+        html = build_main_screen()
 
     util.send_html(html)

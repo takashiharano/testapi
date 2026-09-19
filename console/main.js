@@ -578,7 +578,7 @@ main.onError = function() {
 //-----------------------------------------------------------------------------
 main.http = function(req, cb) {
   req.cb = cb;
-  websys.http(req);
+  util.http(req);
 };
 
 main.callApi = function(act, params, cb) {
