@@ -37,7 +37,7 @@ def build_main_screen(context):
 <div id="body1">
 <div id="header-line">
 <div id="header-content">
-<span id="title" style="margin-left:8px;"><span id="api">API</span> Emulator - Response Editor</span>
+<span id="title" style="margin-left:8px;"><span class="pseudo-link" onclick="main.openAboutDialog();"><span id="api">API</span> Emulator</span> - HTTP/1.1 Response Editor</span>
 <span id="url-info" style="margin-left:16px;">API URL <span id="url"></span><span id="copy-url"></span></span>
 <span id="clock"></span>
 </div>
@@ -52,14 +52,14 @@ def build_main_screen(context):
 
 <div style="margin-top:8px;margin-bottom:4px;">
 <span>
-<button class="button-large button-blue" onclick="main.save();">Save</button>
+<button class="button-large button-blue" onclick="main.apply();">Apply</button>
 </span>
 
 <span style="margin-left:8px;">
 <label class="switch">
-  <input type="checkbox" id="auto-apply" onchange="main.onAutoApplyChange(this);">
+  <input type="checkbox" id="auto-apply">
   <span class="slider round"></span>
-</label><span style="margin-left:6px;">Auto</span>
+</label><span style="margin-left:6px;">Auto Apply</span>
 
 <span style="margin-left:6px;">Status:</span>
 <span>
@@ -72,12 +72,13 @@ def build_main_screen(context):
 <button id="button-503" class="status-button" onclick="main.onSetStatusButton(503);" data-tooltip2="503 Service Unavailable">503</button>
 </span>
 
-<input type="text" id="status-code" spellcheck="false"><button onclick="main.onStatusSet();" style="margin-left:4px;">Set</button>
-<select id="status" onchange="main.onStatusSelected();">
+<select id="status" onchange="main.onStatusSelectChanged();">
 <option value=""></option>
 <optgroup label="1. Informational responses">
   <option value="100">100 Continue</option>
   <option value="101">101 Switching Protocols</option>
+  <option value="102">102 Processing</option>
+  <option value="103">103 Early Hints</option>
 </optgroup>
 <optgroup label="2. Successful responses">
   <option value="200">200 OK</option>
@@ -87,6 +88,9 @@ def build_main_screen(context):
   <option value="204">204 No Content</option>
   <option value="205">205 Reset Content</option>
   <option value="206">206 Partial Content</option>
+  <option value="207">207 Multi-Status</option>
+  <option value="208">208 Already Reported</option>
+  <option value="226">226 IM Used</option>
 </optgroup>
 <optgroup label="3. Redirection messages">
   <option value="300">300 Multiple Choices</option>
@@ -96,6 +100,7 @@ def build_main_screen(context):
   <option value="304">304 Not Modified</option>
   <option value="305">305 Use Proxy</option>
   <option value="307">307 Temporary Redirect</option>
+  <option value="308">308 Permanent Redirect</option>
 </optgroup>
 <optgroup label="4. Client error responses">
   <option value="400">400 Bad Request</option>
@@ -106,27 +111,44 @@ def build_main_screen(context):
   <option value="405">405 Method Not Allowed</option>
   <option value="406">406 Not Acceptable</option>
   <option value="407">407 Proxy Authentication Required</option>
-  <option value="408">408 Request Time-out</option>
+  <option value="408">408 Request Timeout</option>
   <option value="409">409 Conflict</option>
   <option value="410">410 Gone</option>
   <option value="411">411 Length Required</option>
   <option value="412">412 Precondition Failed</option>
-  <option value="413">413 Request Entity Too Large</option>
-  <option value="414">414 Request-URI Too Large</option>
+  <option value="413">413 Content Too Large</option>
+  <option value="414">414 URI Too Long</option>
   <option value="415">415 Unsupported Media Type</option>
-  <option value="416">416 Requested range not satisfiable</option>
+  <option value="416">416 Range Not Satisfiable</option>
   <option value="417">417 Expectation Failed</option>
   <option value="418">418 I'm a teapot</option>
+  <option value="421">421 Misdirected Request</option>
+  <option value="422">422 Unprocessable Content</option>
+  <option value="423">423 Locked</option>
+  <option value="424">424 Failed Dependency</option>
+  <option value="425">425 Too Early</option>
+  <option value="426">426 Upgrade Required</option>
+  <option value="428">428 Precondition Required</option>
+  <option value="429">429 Too Many Requests</option>
+  <option value="431">431 Request Header Fields Too Large</option>
+  <option value="451">451 Unavailable For Legal Reasons</option>
 </optgroup>
 <optgroup label="5. Server error responses">
   <option value="500">500 Internal Server Error</option>
   <option value="501">501 Not Implemented</option>
   <option value="502">502 Bad Gateway</option>
   <option value="503">503 Service Unavailable</option>
-  <option value="504">504 Gateway Time-out</option>
-  <option value="505">505 HTTP Version not supported</option>
+  <option value="504">504 Gateway Timeout</option>
+  <option value="505">505 HTTP Version Not Supported</option>
+  <option value="506">506 Variant Also Negotiates</option>
+  <option value="507">507 Insufficient Storage</option>
+  <option value="508">508 Loop Detected</option>
+  <option value="510">510 Not Extended</option>
+  <option value="511">511 Network Authentication Required</option>
 </optgroup>
 </select>
+
+<input type="text" id="status-code" spellcheck="false"><button onclick="main.loadTemplate();" style="margin-left:4px;">Load Template</button>
 </span>
 
 <span style="margin-left:24px;">
@@ -134,7 +156,7 @@ def build_main_screen(context):
 </span>
 
 <span style="margin-left:24px;">
-<button onclick="main.reload();">Reload</button>
+<button onclick="main.reload();">Revert</button>
 </span>
 </div>
 

@@ -3,9 +3,12 @@
  */
 var main = {};
 
+// RFC 2616
 main.HTTP_STATUS_MESSAGES = {
   100: 'Continue',
   101: 'Switching Protocols',
+  102: 'Processing', // RFC 2518
+  103: 'Early Hints', // RFC 8297
   200: 'OK',
   201: 'Created',
   202: 'Accepted',
@@ -13,6 +16,9 @@ main.HTTP_STATUS_MESSAGES = {
   204: 'No Content',
   205: 'Reset Content',
   206: 'Partial Content',
+  207: 'Multi-Status', // RFC 2518 -> RFC 4918 (WebDAV)
+  208: 'Already Reported', // RFC 5842 (WebDAV)
+  226: 'IM Used', // RFC 3229 (HTTP Delta encoding)
   300: 'Multiple Choices',
   301: 'Moved Permanently',
   302: 'Found',
@@ -20,6 +26,7 @@ main.HTTP_STATUS_MESSAGES = {
   304: 'Not Modified',
   305: 'Use Proxy',
   307: 'Temporary Redirect',
+  308: 'Permanent Redirect', // RFC 7238 -> RFC 7538 -> RFC 9110
   400: 'Bad Request',
   401: 'Unauthorized',
   402: 'Payment Required',
@@ -28,23 +35,38 @@ main.HTTP_STATUS_MESSAGES = {
   405: 'Method Not Allowed',
   406: 'Not Acceptable',
   407: 'Proxy Authentication Required',
-  408: 'Request Time-out',
+  408: 'Request Timeout',
   409: 'Conflict',
   410: 'Gone',
   411: 'Length Required',
   412: 'Precondition Failed',
-  413: 'Request Entity Too Large',
-  414: 'Request-URI Too Large',
+  413: 'Content Too Large', // RFC 2616 -> RFC 7231 -> RFC 9110
+  414: 'URI Too Long', // RFC 2616 -> RFC 7231
   415: 'Unsupported Media Type',
-  416: 'Requested range not satisfiable',
+  416: 'Range Not Satisfiable', // RFC 2616 -> RFC 7231
   417: 'Expectation Failed',
-  418: 'I\'m a teapot',
+  418: 'I\'m a teapot', // RFC 2324 (Joke RFC / unused)
+  421: 'Misdirected Request', // RFC 7540 -> RFC 9110
+  422: 'Unprocessable Content', // RFC 2518/4918 → RFC 9110 (WebDAV)
+  423: 'Locked', // RFC 2518 → RFC 4918 (WebDAV)
+  424: 'Failed Dependency', // RFC 2518 → RFC 4918 (WebDAV)
+  425: 'Too Early', // RFC 8470
+  426: 'Upgrade Required', // RFC 2817 → RFC 9110
+  428: 'Precondition Required', // RFC 6585
+  429: 'Too Many Requests', // RFC 6585
+  431: 'Request Header Fields Too Large', // RFC 6585
+  451:  'Unavailable For Legal Reasons', // RFC 7725
   500: 'Internal Server Error',
   501: 'Not Implemented',
   502: 'Bad Gateway',
   503: 'Service Unavailable',
-  504: 'Gateway Time-out',
-  505: 'HTTP Version not supported'
+  504: 'Gateway Timeout',
+  505: 'HTTP Version Not Supported',
+  506: 'Variant Also Negotiates', // RFC 2295
+  507: 'Insufficient Storage', // RFC 2518 → RFC 4918 (WebDAV)
+  508: 'Loop Detected', // RFC 5842 (WebDAV)
+  510: 'Not Extended', // RFC 2774 (OBSOLETED)
+  511: 'Network Authentication Required' // RFC 6585
 };
 
 main.ST_NONE = 0;
@@ -69,6 +91,9 @@ $onReady = function() {
 
   main.led1 = new util.Led('#led1');
   main.console1 = util.initConsole('#log-console');
+
+  $el('#data-header').onchanged = main.onHeaderChanged;
+  $el('#data-header').oninput = main.onHeaderChanged;
 
   util.textarea.addStatusInfo('#data-body', '#textareainfo');
   $el('#data-header').focus();
@@ -122,10 +147,9 @@ main.getDataCb = function(xhr, res, req) {
   }
 };
 
-main.save = function() {
+main.apply = function() {
+  main.activeStatus = main.getCurrentStatusCode();
   main.saveData();
-  main.activeStatus = -1;
-  main.activeButton(-1);
 };
 
 main.activeButton = function(status) {
@@ -205,21 +229,9 @@ main.buildBodyTemplate200 = function() {
   return '{"message":"Hello, World!"}';
 };
 
-main.onAutoApplyChange = function(el) {
-  if (!el.checked) {
-    main.activeButton(-1);
-  }
-};
-
 main.onSetStatusButton = function(status) {
   main.setResponseTemplate(status);
-  if ($el('#auto-apply').checked) {
-    $el('#status').value = '';
-    $el('#status-code').value = '';
-    main.saveData();
-    main.activeStatus = status;
-    main.activeButton(status);
-  }
+  main.onStatusTemplateSet(status);
 };
 
 main.getHttpStatusMessage = function(status) {
@@ -251,7 +263,7 @@ main.setResponseTemplate = function(status) {
     case 301:
     case 302:
     case 307:
-      var url = main.apiurl + 'testpage.html';
+      var url = main.apiurl + 'test.html';
       h += 'Location: ' + url + '\n';
       break;
     case 401:
@@ -296,24 +308,58 @@ main.setData = function(h, b) {
   $el('#data-body').value = b;
 };
 
-main.onStatusSet = function() {
+main.loadTemplate = function() {
   var status = $el('#status-code').value.trim();
   if (status.match(/[0-9]{3}/)) {
     main.setResponseTemplate(status);
     $el('#status').value = '';
-    main.inActiveButton();
+    main.onStatusTemplateSet(status);
   } else {
     main.showInfotip('Status code must be 3 digit number');
   }
 };
 
-main.onStatusSelected = function() {
+main.onStatusSelectChanged = function() {
   var status = $el('#status').value;
   if (status) {
     main.setResponseTemplate(status);
     $el('#status-code').value = '';
-    main.inActiveButton();
+    main.onStatusTemplateSet(status);
   }
+};
+
+main.onStatusTemplateSet = function(status) {
+  main.setResponseTemplate(status);
+  $el('#status').value = '';
+  $el('#status-code').value = '';
+  main.onStatusChanged(status);
+  if ($el('#auto-apply').checked) {
+    main.apply();
+  }
+};
+
+main.onStatusChanged = function(status) {
+  main.activeStatus = status;
+  main.activeCurrentStatusButton();
+};
+
+main.onHeaderChanged = function() {
+  main.activeCurrentStatusButton();
+};
+
+main.activeCurrentStatusButton = function() {
+  var status = main.getCurrentStatusCode();
+  main.activeButton(status);
+};
+
+main.getCurrentStatusCode = function() {
+  var v = $el('#data-header').value.trim().replace(/\n/g, ' ');
+  var status = null;
+  if (v.match(/^HTTP\/1.1 ([0-9]{3}) /)) {
+    status = v.replace(/^HTTP\/1.1 ([0-9]{3}) .*/, '$1');
+  }
+  status = (status ? (status | 0) : -1);
+  return status;
 };
 
 main.setDateField = function() {
@@ -582,7 +628,7 @@ $onCtrlS = function(e) {
 
 $onEnterKey = function(e) {
   if ($el('#status-code').hasFocus()) {
-    main.onStatusSet();
+    main.loadTemplate();
   }
 };
 
@@ -590,4 +636,8 @@ $onEscKey = function(e) {
   if (main.logWindow) {
     main.logWindow.close();
   }
+};
+
+main.openAboutDialog = function() {
+  util.alert('Test API\n\n&copy; 2025 Takashi Harano\nMIT LIcense\n\n<a href="https://github.com/takashiharano/testapi" target="_blank">GitHub</a>');
 };
