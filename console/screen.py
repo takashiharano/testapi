@@ -1,5 +1,5 @@
 #==============================================================================
-# API EMULATOR - Console Screen
+# API Emulator - Console Screen
 # Copyright 2025 Takashi Harano
 #==============================================================================
 import os
@@ -33,7 +33,6 @@ def build_main_screen():
 '''
     html += '<title>Test API Console</title>'
     html += '<link rel="stylesheet" href="style.css" />'
-    html += '<script src="' + ROOT_PATH + 'libs/sha.js"></script>'
     html += '<script src="' + ROOT_PATH + 'libs/debug.js"></script>'
     html += '<script src="' + ROOT_PATH + 'libs/util.js"></script>'
 
