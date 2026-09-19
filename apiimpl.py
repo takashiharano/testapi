@@ -5,6 +5,7 @@
 #==============================================================================
 import os
 import sys
+import socket
 
 ROOT_DIR = '../'
 sys.path.append(os.path.join(os.path.dirname(__file__), ROOT_DIR + 'libs'))
