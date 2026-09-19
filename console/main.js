@@ -98,6 +98,7 @@ $onReady = function() {
   util.textarea.addStatusInfo('#data-body', '#textareainfo');
   $el('#data-header').focus();
 
+  main.getData();
   main.startAutoReload();
 };
 
@@ -107,10 +108,6 @@ main.printLog = function(s) {
 
 main.writeLog = function(s) {
   main.console1.write(s);
-};
-
-main.onSysReady = function() {
-  main.getData();
 };
 
 main.reload = function() {
@@ -246,7 +243,8 @@ main.setResponseTemplate = function(status) {
   var message = main.getHttpStatusMessage(status);
 
   var d = main.getRfc822DateString();
-  var statusMessage = status + ' ' + message;
+  var statusCode = String(status).padStart(3, '0');
+  var statusMessage = statusCode + ' ' + message;
 
   var b = '';
   if (main.isBodyRequired(status)) {
@@ -310,7 +308,7 @@ main.setData = function(h, b) {
 
 main.loadTemplate = function() {
   var status = $el('#status-code').value.trim();
-  if (status.match(/[0-9]{3}/)) {
+  if (status.match(/^[0-9]{3}$/)) {
     main.setResponseTemplate(status);
     $el('#status').value = '';
     main.onStatusTemplateSet(status);

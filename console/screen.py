@@ -41,7 +41,7 @@ def build_main_screen():
         html += '<script src="' + ROOT_PATH + 'websys/websys.js"></script>'
         html += '<script src="./?res=js"></script>'
 
-    html += '''<script src="main.js"></script>'
+    html += '''<script src="main.js"></script>
 </head>
 <body>
 <div id="body1">
@@ -235,7 +235,7 @@ $onLoad = function() {
 #------------------------------------------------------------------------------
 def send_js():
     js = 'var main = main || {};'
-    js += 'websys.init(\'testapi-console\', \'' + ROOT_PATH + '/\', main.onSysReady);'
+    js += 'websys.init(\'testapi-console\', \'' + ROOT_PATH + '/\');'
     util.send_response(js, 'text/javascript')
 
 #------------------------------------------------------------------------------

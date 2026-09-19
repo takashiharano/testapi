@@ -156,7 +156,7 @@ def main():
     if appconfig.console_auth_required:
         if 'websys' in sys.modules:
             if context.is_authorized():
-                if context.has_permission('testapi'):
+                if context.has_permission(appconfig.console_app_permission_name):
                     proc_api(context, act)
                 else:
                     proc_on_forbidden()
