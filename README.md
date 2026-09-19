@@ -92,7 +92,7 @@ Other status codes can be selected from the status list or entered manually. **A
 
 `Content-Length` is updated automatically when the response body is edited.
 
-![testapi1](https://github.com/user-attachments/assets/0f1edff9-1c69-42c6-b2e9-befb4071ae93)
+![testapi1](https://github.com/user-attachments/assets/d70a6e51-47c1-4a26-920f-f47445c1f98a)
 
 ## Built-in APIs
 The `api` query parameter can be used to call several built-in test endpoints instead of the configured response.
