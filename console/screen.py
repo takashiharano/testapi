@@ -11,14 +11,14 @@ BASE_PATH = '../'
 sys.path.append(os.path.join(os.path.dirname(__file__), ROOT_PATH + 'libs'))
 import util
 
+util.append_system_path(__file__, BASE_PATH)
+import appconfig
+
 util.append_system_path(__file__, ROOT_PATH + '/websys')
 try:
     import websys
 except:
     pass
-
-util.append_system_path(__file__, BASE_PATH)
-import appconfig
 
 #------------------------------------------------------------------------------
 def build_main_screen():

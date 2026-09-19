@@ -11,16 +11,16 @@ BASE_PATH = '../'
 sys.path.append(os.path.join(os.path.dirname(__file__), ROOT_PATH + 'libs'))
 import util
 
+util.append_system_path(__file__, BASE_PATH)
+import appconfig
+import appcommon
+import applogger
+
 util.append_system_path(__file__, ROOT_PATH + 'websys')
 try:
     import websys
 except:
     pass
-
-util.append_system_path(__file__, BASE_PATH)
-import appconfig
-import appcommon
-import applogger
 
 DATA_FILE_PATH = BASE_PATH + '_data_.txt'
 
