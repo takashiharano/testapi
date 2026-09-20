@@ -451,7 +451,7 @@ main.printLogs = function(logs) {
     }
 
     var isSysLog = (method.match(/#.+#/) ? 1 : 0);
-    var m = '<span class="log-line" onclick="main.getDetaiedlLog(' + timestamp + ', ' + isSysLog + ');">';
+    var m = '<span class="log-line"  data-syslog="' + isSysLog + '" onclick="main.getDetaiedlLog(' + timestamp + ', ' + isSysLog + ');">';
     m += dt + '\t' + method + '\t' + status + ' ' + message + '\t' + addr + '\t' + ua + '\t' + bLen + ' bytes'
     m += '</span>\n';
     s += m;
