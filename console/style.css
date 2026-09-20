@@ -133,13 +133,13 @@ button:hover, input[type="button"]:hover, input[type="submit"]:hover {
 }
 
 #url-info {
-  color: #7195a6;
+  color: #7e9fb1;
   font-size: 14px;
 }
 
 #url {
   margin-left: 4px;
-  color: #3dc5ff;
+  color: #6fb7da;
   font-family: Consolas, Monaco, Menlo, monospace, sans-serif;
 }
 
