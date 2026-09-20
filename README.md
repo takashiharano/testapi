@@ -1,5 +1,5 @@
 # TestAPI
-Browser-based HTTP API emulator and HTTP/1.1 response editor.  
+Browser-based HTTP/1.1 API emulator and response editor.  
 Configure arbitrary status codes, response headers and bodies, and inspect incoming request logs from the browser.
 
 ## Requirements
