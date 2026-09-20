@@ -554,7 +554,7 @@ main.startAutoReload = function() {
   main.autoReload = true;
   var updateInterval = main.INTERVAL;
   util.IntervalProc.start('getlog', main.procInterval, updateInterval, null, true);
-  main.led1.on();
+  main.led1.blink2();
 };
 
 main.stopAutoReload = function() {
