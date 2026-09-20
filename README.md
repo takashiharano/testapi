@@ -39,9 +39,9 @@ Deploy the files to the server as below:
 |     +- style.css [644]
 |
 +- libs/
-|  |
-|  +- util.js
-|  +- util.py
+   |
+   +- util.js
+   +- util.py
 ```
 When console authentication is enabled, deploy `websys` at `/websys/`.
 
