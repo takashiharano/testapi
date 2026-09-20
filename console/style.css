@@ -196,7 +196,8 @@ button:hover, input[type="button"]:hover, input[type="submit"]:hover {
 }
 
 .log-line[data-syslog="1"] {
-    opacity: 0.65;
+  opacity: 0.65;
+  cursor: default !important;
 }
 
 #data-header-wrapper {
