@@ -5,7 +5,6 @@ Configure arbitrary status codes, response headers and bodies, and inspect incom
 ## Required
 - Python 3 and a CGI-capable web server
 - util.js, util.py https://libutil.com/
-- debug.js https://debugjs.net/
 - websys https://github.com/takashiharano/websys (optional)
 
 `websys` is required only when console authentication is enabled in `appconfig.py`. It is not required by default.
@@ -37,11 +36,10 @@ Deploy the files to the server as below:
 |
 +- libs/
 |  |
-|  +- debug.js
 |  +- util.js
 |  +- util.py
 |
-+- websys/                 # Optional; required when console authentication is enabled
++- websys/                 # Optional; required only when console authentication is enabled
 ```
 
 The web server process must be able to write the response data and log files used by TestAPI.  

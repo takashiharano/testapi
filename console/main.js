@@ -81,7 +81,6 @@ main.activeStatus = -1;
 main.logWindow = null;
 
 $onReady = function() {
-  dbg.init({zoom: 1.4});
   util.clock('#clock', '%YYYY-%MM-%DD %W %HH:%mm:%SS %Z');
 
   var url = location.href.replace(/console\/$/, '');
