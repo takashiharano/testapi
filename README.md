@@ -2,10 +2,14 @@
 Browser-based HTTP API emulator and HTTP/1.1 response editor.  
 Configure arbitrary status codes, response headers and bodies, and inspect incoming request logs from the browser.
 
-## Required
+## Requirements
 - Python 3 and a CGI-capable web server
-- util.js, util.py https://libutil.com/
-- websys https://github.com/takashiharano/websys (optional)
+- Util libraries https://libutil.com/
+  - util.js
+  - util.py
+
+### Optional
+- websys https://github.com/takashiharano/websys
 
 `websys` is required only when console authentication is enabled in `appconfig.py`. It is not required by default.
 
@@ -38,9 +42,8 @@ Deploy the files to the server as below:
 |  |
 |  +- util.js
 |  +- util.py
-|
-+- websys/                 # Optional; required only when console authentication is enabled
 ```
+When console authentication is enabled, deploy `websys` at `/websys/`.
 
 The web server process must be able to write the response data and log files used by TestAPI.  
 Create the runtime paths as needed and grant write permission to the web server process:
@@ -68,7 +71,7 @@ http(s)://SERVER/testapi/console/
 ```
 
 Edit the HTTP response headers and body, then click **Apply**.  
-The configured response is returned from:
+The configured response is served at:
 
 ```
 http(s)://SERVER/testapi/
