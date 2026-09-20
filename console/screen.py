@@ -171,12 +171,12 @@ def build_main_screen():
 
 <div id="data-area">
 <div><span class="item-name">Headers</span></div>
-<div id="data-header-wrappeer">
+<div id="data-header-wrapper">
 <textarea id="data-header" spellcheck="false"></textarea>
 </div>
 
 <div style="margin-top:16px;"><span class="item-name">Body</span></div>
-<div id="data-body-wrappeer">
+<div id="data-body-wrapper">
 <textarea id="data-body" oninput="main.onDataBodyChange();" onchange="main.onDataBodyChange();" spellcheck="false"></textarea>
 <div id="textareainfo"></div>
 </div>
