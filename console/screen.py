@@ -48,7 +48,10 @@ def build_main_screen():
 <div id="header-content">
 <span id="title" style="margin-left:8px;"><span class="pseudo-link" onclick="main.openAboutDialog();">API Emulator</span> - HTTP/1.1 Response Editor</span>
 <span id="url-info" style="margin-left:16px;">API URL <span id="url"></span><span id="copy-url"></span></span>
+<span id="header-right">
+<button onclick="main.setDateField();" data-tooltip="Set current date-time to Date field">Set as Date Header</button>
 <span id="clock"></span>
+</span>
 </div>
 </div>
 
@@ -62,6 +65,7 @@ def build_main_screen():
 <div style="margin-top:8px;margin-bottom:4px;">
 <span>
 <button class="button-large button-blue" onclick="main.apply();">Apply</button>
+<button style="margin-left:4px;" onclick="main.reload();">Revert</button>
 </span>
 
 <span style="margin-left:8px;">
@@ -71,9 +75,10 @@ def build_main_screen():
 </label><span style="margin-left:6px;">Auto Apply</span>
 
 <span style="margin-left:6px;">Status:</span>
-<span>
+<span class="status-buttons">
 <button id="button-200" class="status-button" onclick="main.onSetStatusButton(200);" data-tooltip2="200 OK">200</button>
 <button id="button-301" class="status-button" onclick="main.onSetStatusButton(301);" data-tooltip2="301 Moved Permanently">301</button>
+<button id="button-400" class="status-button" onclick="main.onSetStatusButton(400);" data-tooltip2="400 Bad Request">400</button>
 <button id="button-401" class="status-button" onclick="main.onSetStatusButton(401);" data-tooltip2="401 Unauthorized">401</button>
 <button id="button-403" class="status-button" onclick="main.onSetStatusButton(403);" data-tooltip2="403 Forbidden">403</button>
 <button id="button-404" class="status-button" onclick="main.onSetStatusButton(404);" data-tooltip2="404 Not Found">404</button>
@@ -156,16 +161,7 @@ def build_main_screen():
   <option value="511">511 Network Authentication Required</option>
 </optgroup>
 </select>
-
 <input type="text" id="status-code" spellcheck="false"><button onclick="main.loadTemplate();" style="margin-left:4px;">Load Template</button>
-</span>
-
-<span style="margin-left:24px;">
-<button onclick="main.setDateField();" data-tooltip="Set current date-time to Date field">Set Date:</button>
-</span>
-
-<span style="margin-left:24px;">
-<button onclick="main.reload();">Revert</button>
 </span>
 </div>
 

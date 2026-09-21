@@ -1,7 +1,7 @@
 html, body {
   width: 100%;
   height: calc(100vh - 20px);
-  min-width: 1480px;
+  min-width: 1350px;
   margin: 0;
   background: #07131d;
   color: #c9e6f2;
@@ -110,6 +110,15 @@ button:hover, input[type="button"]:hover, input[type="submit"]:hover {
   background: #087fc0;
 }
 
+.status-buttons {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.status-button {
+  min-width: 54px;
+}
+
 #header-line {
   position: relative;
   display: table;
@@ -150,9 +159,12 @@ button:hover, input[type="button"]:hover, input[type="submit"]:hover {
   font-family: Consolas, Monaco, Menlo, monospace, sans-serif;
 }
 
-#clock {
+#header-right {
   position: absolute;
   right: 10px;
+}
+
+#clock {
   color: #72d7ff;
   font-family: Consolas, Monaco, Menlo, monospace, sans-serif;
 }
