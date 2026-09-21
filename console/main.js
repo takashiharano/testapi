@@ -71,7 +71,7 @@ main.HTTP_STATUS_MESSAGES = {
 };
 
 main.ST_NONE = 0;
-main.ST_INITIALIED = 1;
+main.ST_INITIALIZED = 1;
 main.INTERVAL = 1500;
 main.apiurl = '';
 main.autoReload = false;
@@ -92,7 +92,7 @@ $onReady = function() {
   main.led1 = new util.Led('#led1');
   main.console1 = util.initConsole('#log-console');
 
-  $el('#data-header').onchanged = main.onHeaderChanged;
+  $el('#data-header').onchange = main.onHeaderChanged;
   $el('#data-header').oninput = main.onHeaderChanged;
 
   util.textarea.addStatusInfo('#data-body', '#textareainfo');
@@ -112,7 +112,6 @@ main.writeLog = function(s) {
 
 main.reload = function() {
   main.getData();
-  main.inActiveButton();
 };
 
 main.getData = function() {
@@ -136,11 +135,12 @@ main.getDataCb = function(xhr, res, req) {
   var body = data.body;
   $el('#data-header').value = header;
   $el('#data-body').value = body;
+  main.onHeaderChanged();
 
-  if (main.status & main.ST_INITIALIED) {
+  if (main.status & main.ST_INITIALIZED) {
     main.showInfotip('Data Loaded');
   } else {
-    main.status |= main.ST_INITIALIED;
+    main.status |= main.ST_INITIALIZED;
   }
 };
 
@@ -150,11 +150,11 @@ main.apply = function() {
 };
 
 main.activeButton = function(status) {
-  main.inActiveButton();
+  main.deactivateStatusButtons();
   $el('#button-' + status).addClass('button-active');
 };
 
-main.inActiveButton = function() {
+main.deactivateStatusButtons = function() {
   $el('.status-button').removeClass('button-active');
 };
 
@@ -176,14 +176,14 @@ main.saveDataCb = function(xhr, res, req) {
     location.href = location.href;
     return;
   } else if (res.status != 'OK') {
-    var m = res.status + ': ' + res.body
+    var m = res.status + ': ' + res.body;
     main.showInfotip(m);
     return;
   }
-  var m = 'Saved';
+  var m = 'Applied';
   var st = main.activeStatus;
   if (st >= 0) {
-    m = 'HTTP status set to ' + st
+    m += ': ' + st + ' ' + main.getHttpStatusMessage(st);
   }
   main.showInfotip(m);
 };
@@ -227,7 +227,6 @@ main.buildBodyTemplate200 = function() {
 };
 
 main.onSetStatusButton = function(status) {
-  main.setResponseTemplate(status);
   main.onStatusTemplateSet(status);
 };
 
@@ -281,13 +280,19 @@ main.setResponseTemplate = function(status) {
 };
 
 main.isDateHeaderRequired = function(status) {
-  var excludeStatus = [300, 301, 302, 307];
-  return !excludeStatus.includes(status);
+  return !((status >= 100) && (status < 200));
 };
 
 main.isContentHeaderRequired = function(status) {
-  var excludeStatus= [300, 301, 302, 307, 401];
-  return !excludeStatus.includes(status);
+  return main.isBodyRequired(status);
+};
+
+main.isBodyRequired = function(status) {
+  if ((status >= 100) && (status < 200)) {
+    return false;
+  }
+  var EXCLUDE_STATUSES = [204, 205, 300, 301, 302, 303, 304, 307, 308, 401];
+  return !EXCLUDE_STATUSES.includes(status);
 };
 
 main.getContentType = function(status) {
@@ -298,14 +303,6 @@ main.getContentType = function(status) {
   return contentType;
 };
 
-main.isBodyRequired = function(status) {
-  if ((status >= 100) && (status < 200)) {
-    return false;
-  }
-  var EXCLUDE_STATUSES = [204, 205, 300, 301, 302, 307, 304, 401];
-  return !EXCLUDE_STATUSES.includes(status);
-};
-
 main.setData = function(h, b) {
   $el('#data-header').value = h;
   $el('#data-body').value = b;
@@ -314,19 +311,15 @@ main.setData = function(h, b) {
 main.loadTemplate = function() {
   var status = $el('#status-code').value.trim();
   if (status.match(/^[0-9]{3}$/)) {
-    main.setResponseTemplate(status);
-    $el('#status').value = '';
     main.onStatusTemplateSet(status);
   } else {
-    main.showInfotip('Status code must be 3 digit number');
+    main.showInfotip('Status code must be a 3-digit number');
   }
 };
 
 main.onStatusSelectChanged = function() {
   var status = $el('#status').value;
   if (status) {
-    main.setResponseTemplate(status);
-    $el('#status-code').value = '';
     main.onStatusTemplateSet(status);
   }
 };
@@ -455,8 +448,8 @@ main.printLogs = function(logs) {
     }
 
     var isSysLog = (method.match(/#.+#/) ? 1 : 0);
-    var m = '<span class="log-line"  data-syslog="' + isSysLog + '" onclick="main.getDetaiedlLog(' + timestamp + ', ' + isSysLog + ');">';
-    m += dt + '\t' + method + '\t' + status + ' ' + message + '\t' + addr + '\t' + ua + '\t' + bLen + ' bytes'
+    var m = '<span class="log-line" data-syslog="' + isSysLog + '" onclick="main.getDetailedLog(' + timestamp + ', ' + isSysLog + ');">';
+    m += dt + '\t' + method + '\t' + status + ' ' + message + '\t' + addr + '\t' + ua + '\t' + bLen + ' bytes';
     m += '</span>\n';
     s += m;
   }
@@ -492,13 +485,13 @@ main.clearLogsCb = function(xhr, res, req) {
 };
 
 //-----------------------------------------------------------------------------
-main.getDetaiedlLog = function(id, isSysLog) {
+main.getDetailedLog = function(id, isSysLog) {
   if (!isSysLog) {
     var param = {id: id};
-    main.callApi('get_detailed_log', param, main.getDetaiedlLogCb);
+    main.callApi('get_detailed_log', param, main.getDetailedLogCb);
   }
 };
-main.getDetaiedlLogCb = function(xhr, res, req) {
+main.getDetailedLogCb = function(xhr, res, req) {
   if (xhr.status != 200) {
     var m = 'HTTP ' + xhr.status;
     if (xhr.status == 0) {
@@ -604,7 +597,7 @@ main.callApi = function(act, params, cb) {
 main.showInfotip = function(m, d, o) {
   if (!o) o = {};
   o.style = {
-    'font-size': '16px'
+    'font-size': '24px'
   };
   util.infotip.show(m, d, o);
 };
