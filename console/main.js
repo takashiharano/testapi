@@ -4,11 +4,11 @@
  */
 var main = {};
 
-// RFC 2616
+// HTTP status code reason phrases: RFC 2616-based + later RFCs
 main.HTTP_STATUS_MESSAGES = {
   100: 'Continue',
   101: 'Switching Protocols',
-  102: 'Processing', // RFC 2518
+  102: 'Processing', // RFC 2518 (legacy WebDAV)
   103: 'Early Hints', // RFC 8297
   200: 'OK',
   201: 'Created',
@@ -19,18 +19,18 @@ main.HTTP_STATUS_MESSAGES = {
   206: 'Partial Content',
   207: 'Multi-Status', // RFC 2518 -> RFC 4918 (WebDAV)
   208: 'Already Reported', // RFC 5842 (WebDAV)
-  226: 'IM Used', // RFC 3229 (HTTP Delta encoding)
+  226: 'IM Used', // RFC 3229 (Delta encoding)
   300: 'Multiple Choices',
   301: 'Moved Permanently',
   302: 'Found',
   303: 'See Other',
   304: 'Not Modified',
-  305: 'Use Proxy',
+  305: 'Use Proxy', // deprecated
   307: 'Temporary Redirect',
   308: 'Permanent Redirect', // RFC 7238 -> RFC 7538 -> RFC 9110
   400: 'Bad Request',
   401: 'Unauthorized',
-  402: 'Payment Required',
+  402: 'Payment Required', // reserved
   403: 'Forbidden',
   404: 'Not Found',
   405: 'Method Not Allowed',
@@ -44,19 +44,19 @@ main.HTTP_STATUS_MESSAGES = {
   413: 'Content Too Large', // RFC 2616 -> RFC 7231 -> RFC 9110
   414: 'URI Too Long', // RFC 2616 -> RFC 7231
   415: 'Unsupported Media Type',
-  416: 'Range Not Satisfiable', // RFC 2616 -> RFC 7231
+  416: 'Range Not Satisfiable', // RFC 2616 -> RFC 7233 -> RFC 9110
   417: 'Expectation Failed',
   418: 'I\'m a teapot', // RFC 2324 (Joke RFC / unused)
   421: 'Misdirected Request', // RFC 7540 -> RFC 9110
-  422: 'Unprocessable Content', // RFC 2518/4918 → RFC 9110 (WebDAV)
-  423: 'Locked', // RFC 2518 → RFC 4918 (WebDAV)
-  424: 'Failed Dependency', // RFC 2518 → RFC 4918 (WebDAV)
+  422: 'Unprocessable Content', // RFC 2518/4918 (WebDAV) -> RFC 9110
+  423: 'Locked', // RFC 2518 -> RFC 4918 (WebDAV)
+  424: 'Failed Dependency', // RFC 2518 -> RFC 4918 (WebDAV)
   425: 'Too Early', // RFC 8470
-  426: 'Upgrade Required', // RFC 2817 → RFC 9110
+  426: 'Upgrade Required', // RFC 2817 -> RFC 9110
   428: 'Precondition Required', // RFC 6585
   429: 'Too Many Requests', // RFC 6585
   431: 'Request Header Fields Too Large', // RFC 6585
-  451:  'Unavailable For Legal Reasons', // RFC 7725
+  451: 'Unavailable For Legal Reasons', // RFC 7725
   500: 'Internal Server Error',
   501: 'Not Implemented',
   502: 'Bad Gateway',
@@ -64,7 +64,7 @@ main.HTTP_STATUS_MESSAGES = {
   504: 'Gateway Timeout',
   505: 'HTTP Version Not Supported',
   506: 'Variant Also Negotiates', // RFC 2295
-  507: 'Insufficient Storage', // RFC 2518 → RFC 4918 (WebDAV)
+  507: 'Insufficient Storage', // RFC 2518 -> RFC 4918 (WebDAV)
   508: 'Loop Detected', // RFC 5842 (WebDAV)
   510: 'Not Extended', // RFC 2774 (OBSOLETED)
   511: 'Network Authentication Required' // RFC 6585
@@ -191,7 +191,7 @@ main.saveDataCb = function(xhr, res, req) {
 main.getRfc822DateString = function(t) {
   var MOS = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun', 7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'};
   if (t === undefined) t = Date.now();
-  dt = util.getDateTimeString(t, '%YYYY%MM%DD%HH%mm%SS%w', '+0');
+  var dt = util.getDateTimeString(t, '%YYYY%MM%DD%HH%mm%SS%w', '+0');
   var yyyy = dt.substring(0, 4);
   var mm = dt.substring(4, 6);
   var dd = dt.substring(6, 8);
@@ -260,7 +260,9 @@ main.setResponseTemplate = function(status) {
   switch (status) {
     case 301:
     case 302:
+    case 303:
     case 307:
+    case 308:
       var url = main.apiurl + 'test.html';
       h += 'Location: ' + url + '\n';
       break;
@@ -297,8 +299,11 @@ main.getContentType = function(status) {
 };
 
 main.isBodyRequired = function(status) {
-  var excludeStatus = [204, 300, 301, 302, 307, 304, 401];
-  return !excludeStatus.includes(status);
+  if ((status >= 100) && (status < 200)) {
+    return false;
+  }
+  var EXCLUDE_STATUSES = [204, 205, 300, 301, 302, 307, 304, 401];
+  return !EXCLUDE_STATUSES.includes(status);
 };
 
 main.setData = function(h, b) {
@@ -371,12 +376,12 @@ main.setHeaderField = function(name, value, index) {
   var a = util.text2list(h);
   var b = [];
   var f = 0;
-  var re = new RegExp(name + ':');
+  var re = new RegExp('^' + name + '\\s*:', 'i');
   for (var i = 0; i < a.length; i++) {
     var s = a[i].trim();
     if (s.match(re)) {
       s = hv;
-      var f = 1;
+      f = 1;
     }
     if (s) b.push(s);
   }
@@ -521,7 +526,7 @@ main.showAccessDetailLog = function(logData) {
 };
 
 main.openLogWindow = function() {
-  html = '<div id="detail-log-wrapper">';
+  var html = '<div id="detail-log-wrapper">';
   html += '<textarea id="detail-log" class="no-line-break" readonly></textarea>';
   html += '</div>';
   var opt = {

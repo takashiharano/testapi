@@ -88,13 +88,13 @@ def build_main_screen():
 
 <select id="status" onchange="main.onStatusSelectChanged();">
 <option value=""></option>
-<optgroup label="1. Informational responses">
+<optgroup label="1xx Informational">
   <option value="100">100 Continue</option>
   <option value="101">101 Switching Protocols</option>
-  <option value="102">102 Processing</option>
+  <option value="102">102 Processing (legacy WebDAV)</option>
   <option value="103">103 Early Hints</option>
 </optgroup>
-<optgroup label="2. Successful responses">
+<optgroup label="2xx Successful">
   <option value="200">200 OK</option>
   <option value="201">201 Created</option>
   <option value="202">202 Accepted</option>
@@ -102,24 +102,24 @@ def build_main_screen():
   <option value="204">204 No Content</option>
   <option value="205">205 Reset Content</option>
   <option value="206">206 Partial Content</option>
-  <option value="207">207 Multi-Status</option>
-  <option value="208">208 Already Reported</option>
-  <option value="226">226 IM Used</option>
+  <option value="207">207 Multi-Status (WebDAV)</option>
+  <option value="208">208 Already Reported (WebDAV)</option>
+  <option value="226">226 IM Used (Delta encoding)</option>
 </optgroup>
-<optgroup label="3. Redirection messages">
+<optgroup label="3xx Redirection">
   <option value="300">300 Multiple Choices</option>
   <option value="301">301 Moved Permanently</option>
   <option value="302">302 Found</option>
   <option value="303">303 See Other</option>
   <option value="304">304 Not Modified</option>
-  <option value="305">305 Use Proxy</option>
+  <option value="305">305 Use Proxy (deprecated)</option>
   <option value="307">307 Temporary Redirect</option>
   <option value="308">308 Permanent Redirect</option>
 </optgroup>
-<optgroup label="4. Client error responses">
+<optgroup label="4xx Client Error">
   <option value="400">400 Bad Request</option>
   <option value="401">401 Unauthorized</option>
-  <option value="402">402 Payment Required</option>
+  <option value="402">402 Payment Required (reserved)</option>
   <option value="403">403 Forbidden</option>
   <option value="404">404 Not Found</option>
   <option value="405">405 Method Not Allowed</option>
@@ -135,11 +135,11 @@ def build_main_screen():
   <option value="415">415 Unsupported Media Type</option>
   <option value="416">416 Range Not Satisfiable</option>
   <option value="417">417 Expectation Failed</option>
-  <option value="418">418 I'm a teapot</option>
+  <option value="418">418 I'm a teapot (Joke RFC / unused)</option>
   <option value="421">421 Misdirected Request</option>
   <option value="422">422 Unprocessable Content</option>
-  <option value="423">423 Locked</option>
-  <option value="424">424 Failed Dependency</option>
+  <option value="423">423 Locked (WebDAV)</option>
+  <option value="424">424 Failed Dependency (WebDAV)</option>
   <option value="425">425 Too Early</option>
   <option value="426">426 Upgrade Required</option>
   <option value="428">428 Precondition Required</option>
@@ -147,7 +147,7 @@ def build_main_screen():
   <option value="431">431 Request Header Fields Too Large</option>
   <option value="451">451 Unavailable For Legal Reasons</option>
 </optgroup>
-<optgroup label="5. Server error responses">
+<optgroup label="5xx Server Error">
   <option value="500">500 Internal Server Error</option>
   <option value="501">501 Not Implemented</option>
   <option value="502">502 Bad Gateway</option>
@@ -155,9 +155,9 @@ def build_main_screen():
   <option value="504">504 Gateway Timeout</option>
   <option value="505">505 HTTP Version Not Supported</option>
   <option value="506">506 Variant Also Negotiates</option>
-  <option value="507">507 Insufficient Storage</option>
-  <option value="508">508 Loop Detected</option>
-  <option value="510">510 Not Extended</option>
+  <option value="507">507 Insufficient Storage (WebDAV)</option>
+  <option value="508">508 Loop Detected (WebDAV)</option>
+  <option value="510">510 Not Extended (obsolete)</option>
   <option value="511">511 Network Authentication Required</option>
 </optgroup>
 </select>
