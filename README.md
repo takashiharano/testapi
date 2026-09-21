@@ -88,7 +88,7 @@ Content-Length: 27
 {"message": "Hello, World!"}
 ```
 
-The console provides quick templates for common HTTP status codes such as `200`, `301`, `401`, `403`, `404`, `500` and `503`.  
+The console provides quick templates for common HTTP status codes such as `200`, `301`, `400`, `401`, `403`, `404`, `500` and `503`.  
 Other status codes can be selected from the status list or entered manually. **Auto Apply** immediately saves a selected template, **Set Date** updates the `Date` header, and **Revert** reloads the currently saved response.
 
 `Content-Length` is updated automatically when the response body is edited.
