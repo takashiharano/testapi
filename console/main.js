@@ -72,7 +72,7 @@ main.HTTP_STATUS_MESSAGES = {
 
 main.ST_NONE = 0;
 main.ST_INITIALIZED = 1;
-main.INTERVAL = 1500;
+main.INTERVAL = 1000;
 main.apiurl = '';
 main.autoReload = false;
 main.status = main.ST_NONE;
